@@ -39,6 +39,7 @@ app.post('/api/v1/tours', (req, res) => {
         `${__dirname}/dev-data/data/tours-simple.json`,
         JSON.stringify(tours),
         (err) => {
+            console.log('Done')
             res.status(201).json({
                 status: 'success',
                 data: {
