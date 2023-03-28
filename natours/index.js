@@ -49,8 +49,6 @@ app.get('/api/v1/tours/:id', (req, res) => {
             },
         })
     }
-
-    res.send('End')
 })
 
 app.post('/api/v1/tours', (req, res) => {
@@ -71,4 +69,41 @@ app.post('/api/v1/tours', (req, res) => {
             })
         }
     )
+})
+
+app.patch('/api/v1/tours/:id', (req, res) => {
+    let id = Number(req.params.id)
+
+    let tour = tours.find((t) => t.id === id)
+
+    if (!tour) {
+        if (id > tours.length) {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Invalid tour ID',
+            })
+        }
+    } else {
+        let newTours = [...tours]
+
+        let index = newTours.findIndex((t) => t.id === id)
+
+        Object.entries(req.body).forEach((param) => {
+            if (newTours[index][param[0]]) {
+                newTours[index][param[0]] = param[1]
+            } else {
+                res.status(404).json({
+                    status: 'fail',
+                    message: 'Invalid Params',
+                })
+            }
+        })
+
+        res.status(200).json({
+            status: 'success',
+            body: {
+                tour: newTours[index],
+            },
+        })
+    }
 })
