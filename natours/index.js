@@ -40,6 +40,11 @@ app.get('/api/v1/tours/:id', (req, res) => {
                 status: 'fail',
                 message: 'Invalid tour ID',
             })
+        } else {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Something went wrong',
+            })
         }
     } else {
         res.status(200).json({
@@ -82,6 +87,11 @@ app.patch('/api/v1/tours/:id', (req, res) => {
                 status: 'fail',
                 message: 'Invalid tour ID',
             })
+        } else {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Something went wrong',
+            })
         }
     } else {
         let newTours = [...tours]
@@ -99,11 +109,55 @@ app.patch('/api/v1/tours/:id', (req, res) => {
             }
         })
 
-        res.status(200).json({
-            status: 'success',
-            body: {
-                tour: newTours[index],
-            },
-        })
+        fs.writeFile(
+            `${__dirname}/dev-data/data/tours-simple.json`,
+            JSON.stringify(newTours),
+            (err) => {
+                res.status(201).json({
+                    status: 'success',
+                    body: {
+                        tour: newTours[index],
+                    },
+                })
+            }
+        )
+    }
+})
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+    let id = Number(req.params.id)
+
+    let newTours = [...tours]
+
+    let tourIndex = newTours.findIndex((t) => t.id === id)
+
+    if (tourIndex > 0) {
+        newTours.splice(tourIndex, 1)
+    }
+
+    if (!(tourIndex > 0)) {
+        if (id > tours.length) {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Invalid tour ID',
+            })
+        } else {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Something went wrong',
+            })
+        }
+    } else {
+        fs.writeFile(
+            `${__dirname}/dev-data/data/tours-simple.json`,
+            JSON.stringify(newTours),
+            (err) => {
+                console.log(req)
+                res.status(204).json({
+                    status: 'success',
+                    message: 'Tour has been deled successfully',
+                })
+            }
+        )
     }
 })
