@@ -11,25 +11,27 @@ app.listen(port, () => {
     console.log('App is running...')
 })
 
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString()
+    next()
+})
+
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 )
 
-// app.get('/', (req, res) => {
-//     res.status(200).json({ message: 'Hello from server side', name: 'Natours' })
-// })
-
-app.get('/api/v1/tours', (req, res) => {
+const getTours = (req, res) => {
     res.status(200).json({
         status: 'success',
         results: tours.length - 1,
+        requestTime: req.requestTime,
         data: {
             tours,
         },
     })
-})
+}
 
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTourById = (req, res) => {
     let id = Number(req.params.id)
 
     let tour = tours.find((t) => t.id === id)
@@ -49,14 +51,15 @@ app.get('/api/v1/tours/:id', (req, res) => {
     } else {
         res.status(200).json({
             status: 'success',
+            requestTime: req.requestTime,
             body: {
                 tour,
             },
         })
     }
-})
+}
 
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
     const newId = tours[tours.length - 1].id + 1
     const newObj = Object.assign({ id: newId }, req.body)
 
@@ -68,15 +71,16 @@ app.post('/api/v1/tours', (req, res) => {
         (err) => {
             res.status(201).json({
                 status: 'success',
+                requestTime: req.requestTime,
                 data: {
                     tour: newObj,
                 },
             })
         }
     )
-})
+}
 
-app.patch('/api/v1/tours/:id', (req, res) => {
+const editTourParamById = (req, res) => {
     let id = Number(req.params.id)
 
     let tour = tours.find((t) => t.id === id)
@@ -115,6 +119,7 @@ app.patch('/api/v1/tours/:id', (req, res) => {
             (err) => {
                 res.status(201).json({
                     status: 'success',
+                    requestTime: req.requestTime,
                     body: {
                         tour: newTours[index],
                     },
@@ -122,9 +127,9 @@ app.patch('/api/v1/tours/:id', (req, res) => {
             }
         )
     }
-})
+}
 
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
     let id = Number(req.params.id)
 
     let newTours = [...tours]
@@ -155,9 +160,19 @@ app.delete('/api/v1/tours/:id', (req, res) => {
                 console.log(req)
                 res.status(204).json({
                     status: 'success',
+                    requestTime: req.requestTime,
                     message: 'Tour has been deled successfully',
                 })
             }
         )
     }
-})
+}
+
+app.route('/api/v1/tours')
+    .get(getTours)
+    .post(createTour)
+
+app.route('/api/v1/tours/:id')
+    .get(getTourById)
+    .patch(editTourParamById)
+    .delete(deleteTour)
