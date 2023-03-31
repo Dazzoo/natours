@@ -1,24 +1,27 @@
 const express = require('express')
 const fs = require('fs')
+const morgan = require('morgan')
 
 const app = express()
 
+/// MIDDLEWARE
+
 app.use(express.json())
 
-const port = 6969
-
-app.listen(port, () => {
-    console.log('App is running...')
-})
+app.use(morgan('dev'))
 
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString()
     next()
 })
 
+/// DATA
+
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 )
+
+/// ROUTE HANDLERS
 
 const getTours = (req, res) => {
     res.status(200).json({
@@ -168,6 +171,8 @@ const deleteTour = (req, res) => {
     }
 }
 
+/// ROUTES
+
 app.route('/api/v1/tours')
     .get(getTours)
     .post(createTour)
@@ -176,3 +181,12 @@ app.route('/api/v1/tours/:id')
     .get(getTourById)
     .patch(editTourParamById)
     .delete(deleteTour)
+
+
+/// START SERVER
+
+const port = 6969
+
+app.listen(port, () => {
+    console.log('App is running...')
+})
