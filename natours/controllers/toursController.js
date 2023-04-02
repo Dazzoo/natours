@@ -4,6 +4,27 @@ const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 )
 
+module.exports.checkId = (req, res, next, value) => {
+    let id = Number(value)
+
+    let tour = tours.find((t) => t.id === id)
+
+    if (!tour) {
+        if (id > tours.length) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Invalid tour ID',
+            })
+        } else {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Something went wrong',
+            })
+        }
+    }
+    next() 
+}
+
 module.exports.getTours = (req, res) => {
     res.status(200).json({
         status: 'success',
@@ -20,19 +41,6 @@ module.exports.getTourById = (req, res) => {
 
     let tour = tours.find((t) => t.id === id)
 
-    if (!tour) {
-        if (id > tours.length) {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Invalid tour ID',
-            })
-        } else {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Something went wrong',
-            })
-        }
-    } else {
         res.status(200).json({
             status: 'success',
             requestTime: req.requestTime,
@@ -40,7 +48,6 @@ module.exports.getTourById = (req, res) => {
                 tour,
             },
         })
-    }
 }
 
 module.exports.createTour = (req, res) => {
@@ -69,19 +76,7 @@ module.exports.editTourParamById = (req, res) => {
 
     let tour = tours.find((t) => t.id === id)
 
-    if (!tour) {
-        if (id > tours.length) {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Invalid tour ID',
-            })
-        } else {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Something went wrong',
-            })
-        }
-    } else {
+
         let newTours = [...tours]
 
         let index = newTours.findIndex((t) => t.id === id)
@@ -110,7 +105,6 @@ module.exports.editTourParamById = (req, res) => {
                 })
             }
         )
-    }
 }
 
 module.exports.deleteTour = (req, res) => {
@@ -124,19 +118,7 @@ module.exports.deleteTour = (req, res) => {
         newTours.splice(tourIndex, 1)
     }
 
-    if (!(tourIndex > 0)) {
-        if (id > tours.length) {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Invalid tour ID',
-            })
-        } else {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Something went wrong',
-            })
-        }
-    } else {
+
         fs.writeFile(
             `${__dirname}/dev-data/data/tours-simple.json`,
             JSON.stringify(newTours),
@@ -149,5 +131,4 @@ module.exports.deleteTour = (req, res) => {
                 })
             }
         )
-    }
 }
