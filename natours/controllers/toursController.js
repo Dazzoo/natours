@@ -4,6 +4,8 @@ const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 )
 
+/// VALIDATORS
+
 module.exports.checkId = (req, res, next, value) => {
     let id = Number(value)
 
@@ -24,6 +26,19 @@ module.exports.checkId = (req, res, next, value) => {
     }
     next() 
 }
+
+
+module.exports.requiredParams = (req, res, next) => {
+    if (!req.body.name || !req.body.price) {
+        return res.status(400).json({
+            status: "bad request"
+        })
+    }
+    console.log(!req.body.price)
+    next()
+}
+
+///
 
 module.exports.getTours = (req, res) => {
     res.status(200).json({
