@@ -4,7 +4,6 @@ const morgan = require('morgan')
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
 
-
 const app = express()
 
 /// MIDDLEWARE
@@ -28,4 +27,4 @@ app.use('/api/v1/tours', tourRouter)
 
 app.use('/api/v1/users', usersRouter)
 
-module.exports = app 
+module.exports = app

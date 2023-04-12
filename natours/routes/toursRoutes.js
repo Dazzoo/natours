@@ -5,11 +5,13 @@ const tourRouter = express.Router()
 
 tourRouter.param('id', toursController.checkId)
 
-tourRouter.route('/')
+tourRouter
+    .route('/')
     .get(toursController.getTours)
-    .post(toursController.requiredParams, toursController.createTour,)
+    .post(toursController.requiredParams, toursController.createTour)
 
-tourRouter.route('/:id')
+tourRouter
+    .route('/:id')
     .get(toursController.getTourById)
     .patch(toursController.editTourParamById)
     .delete(toursController.deleteTour)

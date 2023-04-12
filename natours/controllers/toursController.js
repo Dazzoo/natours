@@ -24,14 +24,13 @@ module.exports.checkId = (req, res, next, value) => {
             })
         }
     }
-    next() 
+    next()
 }
-
 
 module.exports.requiredParams = (req, res, next) => {
     if (!req.body.name || !req.body.price) {
         return res.status(400).json({
-            status: "Required params: name, price"
+            status: 'Required params: name, price',
         })
     }
     console.log(!req.body.price)
@@ -56,13 +55,13 @@ module.exports.getTourById = (req, res) => {
 
     let tour = tours.find((t) => t.id === id)
 
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                tour,
-            },
-        })
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            tour,
+        },
+    })
 }
 
 module.exports.createTour = (req, res) => {
@@ -91,35 +90,34 @@ module.exports.editTourParamById = (req, res) => {
 
     let tour = tours.find((t) => t.id === id)
 
+    let newTours = [...tours]
 
-        let newTours = [...tours]
+    let index = newTours.findIndex((t) => t.id === id)
 
-        let index = newTours.findIndex((t) => t.id === id)
+    Object.entries(req.body).forEach((param) => {
+        if (newTours[index][param[0]]) {
+            newTours[index][param[0]] = param[1]
+        } else {
+            res.status(404).json({
+                status: 'fail',
+                message: 'Invalid Params',
+            })
+        }
+    })
 
-        Object.entries(req.body).forEach((param) => {
-            if (newTours[index][param[0]]) {
-                newTours[index][param[0]] = param[1]
-            } else {
-                res.status(404).json({
-                    status: 'fail',
-                    message: 'Invalid Params',
-                })
-            }
-        })
-
-        fs.writeFile(
-            `${__dirname}/dev-data/data/tours-simple.json`,
-            JSON.stringify(newTours),
-            (err) => {
-                res.status(201).json({
-                    status: 'success',
-                    requestTime: req.requestTime,
-                    body: {
-                        tour: newTours[index],
-                    },
-                })
-            }
-        )
+    fs.writeFile(
+        `${__dirname}/dev-data/data/tours-simple.json`,
+        JSON.stringify(newTours),
+        (err) => {
+            res.status(201).json({
+                status: 'success',
+                requestTime: req.requestTime,
+                body: {
+                    tour: newTours[index],
+                },
+            })
+        }
+    )
 }
 
 module.exports.deleteTour = (req, res) => {
@@ -133,17 +131,16 @@ module.exports.deleteTour = (req, res) => {
         newTours.splice(tourIndex, 1)
     }
 
-
-        fs.writeFile(
-            `${__dirname}/dev-data/data/tours-simple.json`,
-            JSON.stringify(newTours),
-            (err) => {
-                console.log(req)
-                res.status(204).json({
-                    status: 'success',
-                    requestTime: req.requestTime,
-                    message: 'Tour has been deled successfully',
-                })
-            }
-        )
+    fs.writeFile(
+        `${__dirname}/dev-data/data/tours-simple.json`,
+        JSON.stringify(newTours),
+        (err) => {
+            console.log(req)
+            res.status(204).json({
+                status: 'success',
+                requestTime: req.requestTime,
+                message: 'Tour has been deled successfully',
+            })
+        }
+    )
 }
