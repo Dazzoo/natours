@@ -1,5 +1,4 @@
 const express = require('express')
-const fs = require('fs')
 const morgan = require('morgan')
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
