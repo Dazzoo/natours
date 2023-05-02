@@ -3,12 +3,12 @@ const toursController = require('../controllers/toursController')
 
 const tourRouter = express.Router()
 
-tourRouter.param('id', toursController.checkId)
+// tourRouter.param('id', toursController.checkId)
 
 tourRouter
     .route('/')
     .get(toursController.getTours)
-    .post(toursController.requiredParams, toursController.createTour)
+    .post(toursController.createTour)
 
 tourRouter
     .route('/:id')

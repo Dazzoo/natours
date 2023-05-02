@@ -1,4 +1,5 @@
 const fs = require('fs')
+const Tour = require('../models/tourModel')
 
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -6,36 +7,36 @@ const tours = JSON.parse(
 
 /// VALIDATORS
 
-module.exports.checkId = (req, res, next, value) => {
-    let id = Number(value)
+// module.exports.checkId = (req, res, next, value) => {
+//     let id = Number(value)
 
-    let tour = tours.find((t) => t.id === id)
+//     let tour = tours.find((t) => t.id === id)
 
-    if (!tour) {
-        if (id > tours.length) {
-            return res.status(404).json({
-                status: 'fail',
-                message: 'Invalid tour ID',
-            })
-        } else {
-            return res.status(404).json({
-                status: 'fail',
-                message: 'Something went wrong',
-            })
-        }
-    }
-    next()
-}
+//     if (!tour) {
+//         if (id > tours.length) {
+//             return res.status(404).json({
+//                 status: 'fail',
+//                 message: 'Invalid tour ID',
+//             })
+//         } else {
+//             return res.status(404).json({
+//                 status: 'fail',
+//                 message: 'Something went wrong',
+//             })
+//         }
+//     }
+//     next()
+// }
 
-module.exports.requiredParams = (req, res, next) => {
-    if (!req.body.name || !req.body.price) {
-        return res.status(400).json({
-            status: 'Required params: name, price',
-        })
-    }
-    console.log(!req.body.price)
-    next()
-}
+// module.exports.requiredParams = (req, res, next) => {
+//     if (!req.body.name || !req.body.price) {
+//         return res.status(400).json({
+//             status: 'Required params: name, price',
+//         })
+//     }
+//     console.log(!req.body.price)
+//     next()
+// }
 
 ///
 
@@ -51,9 +52,9 @@ module.exports.getTours = (req, res) => {
 }
 
 module.exports.getTourById = (req, res) => {
-    let id = Number(req.params.id)
+    const id = Number(req.params.id)
 
-    let tour = tours.find((t) => t.id === id)
+    const tour = tours.find((t) => t.id === id)
 
     res.status(200).json({
         status: 'success',
@@ -64,35 +65,32 @@ module.exports.getTourById = (req, res) => {
     })
 }
 
-module.exports.createTour = (req, res) => {
-    const newId = tours[tours.length - 1].id + 1
-    const newObj = Object.assign({ id: newId }, req.body)
-
-    tours.push(newObj)
-
-    fs.writeFile(
-        `${__dirname}/dev-data/data/tours-simple.json`,
-        JSON.stringify(tours),
-        (err) => {
-            res.status(201).json({
-                status: 'success',
-                requestTime: req.requestTime,
-                data: {
-                    tour: newObj,
-                },
-            })
-        }
-    )
+module.exports.createTour = async (req, res) => {
+    try {
+        const newTour = await Tour.create(req.body)
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                newTour,
+            },
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
+    }
 }
 
 module.exports.editTourParamById = (req, res) => {
-    let id = Number(req.params.id)
+    const id = Number(req.params.id)
 
-    let tour = tours.find((t) => t.id === id)
+    const tour = tours.find((t) => t.id === id)
 
-    let newTours = [...tours]
+    const newTours = [...tours]
 
-    let index = newTours.findIndex((t) => t.id === id)
+    const index = newTours.findIndex((t) => t.id === id)
 
     Object.entries(req.body).forEach((param) => {
         if (newTours[index][param[0]]) {
@@ -121,11 +119,11 @@ module.exports.editTourParamById = (req, res) => {
 }
 
 module.exports.deleteTour = (req, res) => {
-    let id = Number(req.params.id)
+    const id = Number(req.params.id)
 
-    let newTours = [...tours]
+    const newTours = [...tours]
 
-    let tourIndex = newTours.findIndex((t) => t.id === id)
+    const tourIndex = newTours.findIndex((t) => t.id === id)
 
     if (tourIndex > 0) {
         newTours.splice(tourIndex, 1)
