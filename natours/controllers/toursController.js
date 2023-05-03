@@ -1,9 +1,9 @@
 const fs = require('fs')
 const Tour = require('../models/tourModel')
 
-const tours = JSON.parse(
-    fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-)
+// const tours = JSON.parse(
+//     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+// )
 
 /// VALIDATORS
 
@@ -40,29 +40,43 @@ const tours = JSON.parse(
 
 ///
 
-module.exports.getTours = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        results: tours.length - 1,
-        requestTime: req.requestTime,
-        data: {
-            tours,
-        },
-    })
+module.exports.getTours = async (req, res) => {
+    try {
+        const tours = await Tour.find()
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                tours,
+            },
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
+    }
 }
 
-module.exports.getTourById = (req, res) => {
-    const id = Number(req.params.id)
+module.exports.getTourById = async (req, res) => {
+    try {
+        const id = req.params.id
 
-    const tour = tours.find((t) => t.id === id)
+        const tour = await Tour.findById(id)
 
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            tour,
-        },
-    })
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                tour,
+            },
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
+    }
 }
 
 module.exports.createTour = async (req, res) => {
@@ -83,39 +97,27 @@ module.exports.createTour = async (req, res) => {
     }
 }
 
-module.exports.editTourParamById = (req, res) => {
-    const id = Number(req.params.id)
+module.exports.editTourParamById = async (req, res) => {
+    try {
+        const id = req.params.id
 
-    const tour = tours.find((t) => t.id === id)
-
-    const newTours = [...tours]
-
-    const index = newTours.findIndex((t) => t.id === id)
-
-    Object.entries(req.body).forEach((param) => {
-        if (newTours[index][param[0]]) {
-            newTours[index][param[0]] = param[1]
-        } else {
-            res.status(404).json({
-                status: 'fail',
-                message: 'Invalid Params',
-            })
-        }
-    })
-
-    fs.writeFile(
-        `${__dirname}/dev-data/data/tours-simple.json`,
-        JSON.stringify(newTours),
-        (err) => {
-            res.status(201).json({
-                status: 'success',
-                requestTime: req.requestTime,
-                body: {
-                    tour: newTours[index],
-                },
-            })
-        }
-    )
+        const tour = await Tour.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true,
+        })
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                tour,
+            },
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
+    }
 }
 
 module.exports.deleteTour = (req, res) => {
