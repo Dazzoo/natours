@@ -120,27 +120,22 @@ module.exports.editTourParamById = async (req, res) => {
     }
 }
 
-module.exports.deleteTour = (req, res) => {
-    const id = Number(req.params.id)
+module.exports.deleteTour = async (req, res) => {
+    try {
+        const id = req.params.id
 
-    const newTours = [...tours]
-
-    const tourIndex = newTours.findIndex((t) => t.id === id)
-
-    if (tourIndex > 0) {
-        newTours.splice(tourIndex, 1)
+        const tour = await Tour.findByIdAndDelete(id)
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                tour,
+            },
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
     }
-
-    fs.writeFile(
-        `${__dirname}/dev-data/data/tours-simple.json`,
-        JSON.stringify(newTours),
-        (err) => {
-            console.log(req)
-            res.status(204).json({
-                status: 'success',
-                requestTime: req.requestTime,
-                message: 'Tour has been deled successfully',
-            })
-        }
-    )
 }
