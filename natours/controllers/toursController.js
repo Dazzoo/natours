@@ -52,7 +52,17 @@ module.exports.getTours = async (req, res) => {
             /\b(gte|gt|lt|lte)\b/g,
             (match) => `$${match}`
         )
-        const tours = await Tour.find(JSON.parse(queryString))
+        let query = Tour.find(JSON.parse(queryString))
+        // 3) Sorting
+        if (req.query.sort) {
+            const sortBy = req.query.sort.split(',').join(' ')
+            console.log(sortBy)
+            query.sort(sortBy)
+        } else {
+            query.sort('createdAt')
+        }
+
+        const tours = await query
         res.status(200).json({
             status: 'success',
             requestTime: req.requestTime,
