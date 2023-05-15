@@ -56,10 +56,16 @@ module.exports.getTours = async (req, res) => {
         // 3) Sorting
         if (req.query.sort) {
             const sortBy = req.query.sort.split(',').join(' ')
-            console.log(sortBy)
             query.sort(sortBy)
         } else {
             query.sort('createdAt')
+        }
+        // Fields
+        if (req.query.fields) {
+            let fields = req.query.fields.split(',').join(' ')
+            query.select(fields)
+        } else {
+            query.select('-__v')
         }
 
         const tours = await query
