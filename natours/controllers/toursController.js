@@ -67,6 +67,18 @@ module.exports.getTours = async (req, res) => {
         } else {
             query.select('-__v')
         }
+        // Pagination
+        const page = req.query.page * 1 || 1
+        const limit = req.query.limit * 1 || 100
+        const skip = (page - 1) * limit
+
+        query.skip(skip).limit(limit)
+
+        if (req.query.page) {
+            const countDocuments = await Tour.countDocuments()
+            if (skip >= countDocuments)
+                throw Error(`Page ${page} does not exist`)
+        }
 
         const tours = await query
         res.status(200).json({
@@ -77,7 +89,7 @@ module.exports.getTours = async (req, res) => {
             },
         })
     } catch (err) {
-        res.status(400).json({
+        res.status(404).json({
             status: 'fail',
             message: err,
         })
