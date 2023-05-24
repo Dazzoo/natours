@@ -1,5 +1,6 @@
 const fs = require('fs')
 const Tour = require('../models/tourModel')
+const { query } = require('express')
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -39,6 +40,13 @@ const Tour = require('../models/tourModel')
 // }
 
 ///
+
+module.exports.getBestFiveTours = async (req, res, next) => {
+    req.query.limit = '5'
+    req.query.sort = '-price,rating'
+    req.query.fields = 'name,price,rating'
+    next()
+}
 
 module.exports.getTours = async (req, res) => {
     try {
