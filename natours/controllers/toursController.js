@@ -1,6 +1,7 @@
 const fs = require('fs')
 const Tour = require('../models/tourModel')
 const { query } = require('express')
+const APIFeatures = require('./../utility/apiFeatures')
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -51,17 +52,19 @@ module.exports.getBestFiveTours = async (req, res, next) => {
 module.exports.getTours = async (req, res) => {
     try {
         // 1) Filtering
-        const queryObj = { ...req.query }
-        const excludedFields = ['page', 'sort', 'limit', 'fields']
-        excludedFields.forEach((el) => delete queryObj[el])
-        // 2) Advanced filtering
-        let queryString = JSON.stringify(queryObj)
-        queryString = queryString.replace(
-            /\b(gte|gt|lt|lte)\b/g,
-            (match) => `$${match}`
-        )
-        let query = Tour.find(JSON.parse(queryString))
+        // const queryObj = { ...req.query }
+        // const excludedFields = ['page', 'sort', 'limit', 'fields']
+        // excludedFields.forEach((el) => delete queryObj[el])
+        // // 2) Advanced filtering
+        // let queryString = JSON.stringify(queryObj)
+        // queryString = queryString.replace(
+        //     /\b(gte|gt|lt|lte)\b/g,
+        //     (match) => `$${match}`
+        // )
+        // let query = Tour.find(JSON.parse(queryString))
         // 3) Sorting
+        const features = new APIFeatures(Tour.find(), req.query).filter()
+        let query = features.query
         if (req.query.sort) {
             const sortBy = req.query.sort.split(',').join(' ')
             query.sort(sortBy)
@@ -97,6 +100,7 @@ module.exports.getTours = async (req, res) => {
             },
         })
     } catch (err) {
+        console.log(err)
         res.status(404).json({
             status: 'fail',
             message: err,

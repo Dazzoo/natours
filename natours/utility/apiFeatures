@@ -1,0 +1,26 @@
+const Tour = require('../models/tourModel')
+
+class APIFeatures {
+    constructor(query, queryString) {
+        this.query = query
+        this.queryString = queryString
+    }
+
+    filter() {
+        // 1) Filtering
+        let queryObj = { ...this.queryString }
+        const excludedFields = ['page', 'sort', 'limit', 'fields']
+        excludedFields.forEach((el) => delete queryObj[el])
+        // 2) Advanced filtering
+        let queryString = JSON.stringify(queryObj)
+        queryString = queryString.replace(
+            /\b(gte|gt|lt|lte)\b/g,
+            (match) => `$${match}`
+        )
+        console.log('queryString', queryString)
+        this.query = Tour.find(JSON.parse(queryString))
+        return this
+    }
+}
+
+module.exports = APIFeatures
