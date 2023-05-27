@@ -63,33 +63,27 @@ module.exports.getTours = async (req, res) => {
         // )
         // let query = Tour.find(JSON.parse(queryString))
         // 3) Sorting
-        const features = new APIFeatures(Tour.find(), req.query).filter()
-        let query = features.query
-        if (req.query.sort) {
-            const sortBy = req.query.sort.split(',').join(' ')
-            query.sort(sortBy)
-        } else {
-            query.sort('createdAt')
-        }
+        const features = new APIFeatures(Tour.find(), req.query)
+            .filter()
+            .sort()
+            .select()
+            .pagination()
+
+        let query = await features.query
+        // if (req.query.sort) {
+        //     const sortBy = req.query.sort.split(',').join(' ')
+        //     query.sort(sortBy)
+        // } else {
+        //     query.sort('createdAt')
+        // }
         // Fields
-        if (req.query.fields) {
-            let fields = req.query.fields.split(',').join(' ')
-            query.select(fields)
-        } else {
-            query.select('-__v')
-        }
+        // if (req.query.fields) {
+        //     let fields = req.query.fields.split(',').join(' ')
+        //     query.select(fields)
+        // } else {
+        //     query.select('-__v')
+        // }
         // Pagination
-        const page = req.query.page * 1 || 1
-        const limit = req.query.limit * 1 || 100
-        const skip = (page - 1) * limit
-
-        query.skip(skip).limit(limit)
-
-        if (req.query.page) {
-            const countDocuments = await Tour.countDocuments()
-            if (skip >= countDocuments)
-                throw Error(`Page ${page} does not exist`)
-        }
 
         const tours = await query
         res.status(200).json({
