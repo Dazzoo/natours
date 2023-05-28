@@ -51,18 +51,6 @@ module.exports.getBestFiveTours = async (req, res, next) => {
 
 module.exports.getTours = async (req, res) => {
     try {
-        // 1) Filtering
-        // const queryObj = { ...req.query }
-        // const excludedFields = ['page', 'sort', 'limit', 'fields']
-        // excludedFields.forEach((el) => delete queryObj[el])
-        // // 2) Advanced filtering
-        // let queryString = JSON.stringify(queryObj)
-        // queryString = queryString.replace(
-        //     /\b(gte|gt|lt|lte)\b/g,
-        //     (match) => `$${match}`
-        // )
-        // let query = Tour.find(JSON.parse(queryString))
-        // 3) Sorting
         const features = new APIFeatures(Tour.find(), req.query)
             .filter()
             .sort()
@@ -70,20 +58,6 @@ module.exports.getTours = async (req, res) => {
             .pagination()
 
         let query = await features.query
-        // if (req.query.sort) {
-        //     const sortBy = req.query.sort.split(',').join(' ')
-        //     query.sort(sortBy)
-        // } else {
-        //     query.sort('createdAt')
-        // }
-        // Fields
-        // if (req.query.fields) {
-        //     let fields = req.query.fields.split(',').join(' ')
-        //     query.select(fields)
-        // } else {
-        //     query.select('-__v')
-        // }
-        // Pagination
 
         const tours = await query
         res.status(200).json({
@@ -174,6 +148,42 @@ module.exports.deleteTour = async (req, res) => {
             requestTime: req.requestTime,
             body: {
                 tour,
+            },
+        })
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
+    }
+}
+
+module.exports.getToursReport = async (req, res) => {
+    try {
+        const report = await Tour.aggregate([
+            {
+                $match: {
+                    ratingsAverage: { $gte: 3.0 },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalCount: { $sum: 1 },
+                    ratingsQuantity: { $sum: '$ratingsQuantity' },
+                    averageRating: { $avg: '$ratingsAverage' },
+                    averagePrice: { $avg: '$price' },
+                    lowestPrice: { $min: '$price' },
+                    highestPrice: { $max: '$price' },
+                },
+            },
+        ])
+
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                report,
             },
         })
     } catch (err) {

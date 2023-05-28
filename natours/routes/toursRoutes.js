@@ -9,6 +9,8 @@ tourRouter
     .route('/best-five-tours')
     .get(toursController.getBestFiveTours, toursController.getTours)
 
+tourRouter.route('/report').get(toursController.getToursReport)
+
 tourRouter
     .route('/')
     .get(toursController.getTours)
