@@ -11,6 +11,8 @@ tourRouter
 
 tourRouter.route('/report').get(toursController.getToursReport)
 
+tourRouter.route('/monthly-plan/:year').get(toursController.getMonthlyReport)
+
 tourRouter
     .route('/')
     .get(toursController.getTours)

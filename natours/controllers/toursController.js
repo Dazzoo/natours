@@ -193,3 +193,58 @@ module.exports.getToursReport = async (req, res) => {
         })
     }
 }
+
+module.exports.getMonthlyReport = async (req, res) => {
+    try {
+        const year = req.params.year * 1
+        console.log(new Date(`${year}-01-01`))
+        const MonthlyReport = await Tour.aggregate([
+            {
+                $unwind: '$startDates',
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        $month: '$startDates',
+                    },
+                    totalTours: { $sum: 1 },
+                    tours: { $push: '$name' },
+                },
+            },
+            {
+                $project: {
+                    month: '$_id',
+                    totalTours: '$totalTours',
+                    tours: '$tours',
+                },
+            },
+            {
+                $sort: {
+                    totalTours: -1,
+                },
+            },
+        ])
+
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            body: {
+                MonthlyReport,
+            },
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({
+            status: 'fail',
+            message: err,
+        })
+    }
+}
