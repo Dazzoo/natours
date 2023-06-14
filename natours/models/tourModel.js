@@ -77,7 +77,7 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7
 })
-
+/// SAVE MIDDLEWARE
 tourSchema.pre('save', function (next) {
     console.log('PRE SAVE HOOK')
     this.slug = slugify(this.name, { lower: true })
@@ -89,7 +89,7 @@ tourSchema.post('save', function (doc, next) {
     console.log(doc)
     next()
 })
-
+/// QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
     console.log('PRE FIND HOOK')
     this.find({ secretTour: { $ne: true } })
@@ -100,6 +100,11 @@ tourSchema.pre(/^find/, function (next) {
 tourSchema.post(/^find/, function (doc, next) {
     console.log('POST FIND HOOK')
     console.log(`Query took ${Date.now() - this.start} ms`)
+    next()
+})
+/// AGGREGATE MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
     next()
 })
 
