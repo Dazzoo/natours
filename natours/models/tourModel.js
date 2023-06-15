@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
+var validator = require('validator')
 
 const tourSchema = new mongoose.Schema(
     {
@@ -44,6 +45,15 @@ const tourSchema = new mongoose.Schema(
             type: Number,
             required: false,
         },
+        priceDiscount: {
+            type: Number,
+            validate: {
+                validator: function (val) {
+                    return val < this.price
+                },
+                message: 'Discount price should be below regular price',
+            },
+        },
         duration: {
             type: Number,
             required: [true, 'A tour must have a duration'],
@@ -64,6 +74,10 @@ const tourSchema = new mongoose.Schema(
         description: {
             type: String,
             required: false,
+            validate: {
+                validator: validator.isAlpha,
+                message: 'Description shoul be alphabetical',
+            },
         },
         summary: {
             type: String,
