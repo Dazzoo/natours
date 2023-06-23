@@ -97,154 +97,124 @@ module.exports.getTourById = async (req, res) => {
     }
 }
 
-module.exports.createTour = async (req, res) => {
-    try {
-        const newTour = await Tour.create(req.body)
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                newTour,
-            },
-        })
-    } catch (err) {
-        res.status(400).json({
-            status: 'fail',
-            message: err,
-        })
+const catchAsync = (fn) => {
+    return (req, res, next) => {
+        fn(req, res, next).catch((err) => next(err))
     }
 }
 
-module.exports.editTourParamById = async (req, res) => {
-    try {
-        const id = req.params.id
+module.exports.createTour = catchAsync(async (req, res, next) => {
+    const newTour = await Tour.create(req.body)
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            newTour,
+        },
+    })
+})
 
-        const tour = await Tour.findByIdAndUpdate(id, req.body, {
-            new: true,
-            runValidators: true,
-        })
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                tour,
+module.exports.editTourParamById = catchAsync(async (req, res) => {
+    const id = req.params.id
+
+    const tour = await Tour.findByIdAndUpdate(id, req.body, {
+        new: true,
+        runValidators: true,
+    })
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            tour,
+        },
+    })
+})
+
+module.exports.deleteTour = catchAsync(async (req, res) => {
+    const id = req.params.id
+
+    const tour = await Tour.findByIdAndDelete(id)
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            tour,
+        },
+    })
+})
+
+module.exports.getToursReport = catchAsync(async (req, res) => {
+    const report = await Tour.aggregate([
+        {
+            $match: {
+                ratingsAverage: { $gte: 3.0 },
             },
-        })
-    } catch (err) {
-        res.status(400).json({
-            status: 'fail',
-            message: err,
-        })
-    }
-}
-
-module.exports.deleteTour = async (req, res) => {
-    try {
-        const id = req.params.id
-
-        const tour = await Tour.findByIdAndDelete(id)
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                tour,
+        },
+        {
+            $group: {
+                _id: null,
+                totalCount: { $sum: 1 },
+                ratingsQuantity: { $sum: '$ratingsQuantity' },
+                averageRating: { $avg: '$ratingsAverage' },
+                averagePrice: { $avg: '$price' },
+                lowestPrice: { $min: '$price' },
+                highestPrice: { $max: '$price' },
             },
-        })
-    } catch (err) {
-        res.status(400).json({
-            status: 'fail',
-            message: err,
-        })
-    }
-}
+        },
+    ])
 
-module.exports.getToursReport = async (req, res) => {
-    try {
-        const report = await Tour.aggregate([
-            {
-                $match: {
-                    ratingsAverage: { $gte: 3.0 },
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            report,
+        },
+    })
+})
+
+module.exports.getMonthlyReport = catchAsync(async (req, res) => {
+    const year = req.params.year * 1
+    console.log(new Date(`${year}-01-01`))
+    const MonthlyReport = await Tour.aggregate([
+        {
+            $unwind: '$startDates',
+        },
+        {
+            $match: {
+                startDates: {
+                    $gte: new Date(`${year}-01-01`),
+                    $lte: new Date(`${year}-12-31`),
                 },
             },
-            {
-                $group: {
-                    _id: null,
-                    totalCount: { $sum: 1 },
-                    ratingsQuantity: { $sum: '$ratingsQuantity' },
-                    averageRating: { $avg: '$ratingsAverage' },
-                    averagePrice: { $avg: '$price' },
-                    lowestPrice: { $min: '$price' },
-                    highestPrice: { $max: '$price' },
+        },
+        {
+            $group: {
+                _id: {
+                    $month: '$startDates',
                 },
+                totalTours: { $sum: 1 },
+                tours: { $push: '$name' },
             },
-        ])
+        },
+        {
+            $project: {
+                month: '$_id',
+                totalTours: '$totalTours',
+                tours: '$tours',
+            },
+        },
+        {
+            $sort: {
+                totalTours: -1,
+            },
+        },
+    ])
 
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                report,
-            },
-        })
-    } catch (err) {
-        res.status(400).json({
-            status: 'fail',
-            message: err,
-        })
-    }
-}
-
-module.exports.getMonthlyReport = async (req, res) => {
-    try {
-        const year = req.params.year * 1
-        console.log(new Date(`${year}-01-01`))
-        const MonthlyReport = await Tour.aggregate([
-            {
-                $unwind: '$startDates',
-            },
-            {
-                $match: {
-                    startDates: {
-                        $gte: new Date(`${year}-01-01`),
-                        $lte: new Date(`${year}-12-31`),
-                    },
-                },
-            },
-            {
-                $group: {
-                    _id: {
-                        $month: '$startDates',
-                    },
-                    totalTours: { $sum: 1 },
-                    tours: { $push: '$name' },
-                },
-            },
-            {
-                $project: {
-                    month: '$_id',
-                    totalTours: '$totalTours',
-                    tours: '$tours',
-                },
-            },
-            {
-                $sort: {
-                    totalTours: -1,
-                },
-            },
-        ])
-
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                MonthlyReport,
-            },
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(400).json({
-            status: 'fail',
-            message: err,
-        })
-    }
-}
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            MonthlyReport,
+        },
+    })
+})
