@@ -2,6 +2,8 @@ const fs = require('fs')
 const Tour = require('../models/tourModel')
 const { query } = require('express')
 const APIFeatures = require('./../utility/apiFeatures')
+const catchAsync = require('./../utility/catchAsync')
+const AppError = require('../utility/appError')
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -49,7 +51,7 @@ module.exports.getBestFiveTours = async (req, res, next) => {
     next()
 }
 
-module.exports.getTours = async (req, res) => {
+module.exports.getTours = async (req, res, next) => {
     try {
         const features = new APIFeatures(Tour.find(), req.query)
             .filter()
@@ -76,32 +78,23 @@ module.exports.getTours = async (req, res) => {
     }
 }
 
-module.exports.getTourById = async (req, res) => {
-    try {
-        const id = req.params.id
+module.exports.getTourById = catchAsync(async (req, res, next) => {
+    const id = req.params.id
 
-        const tour = await Tour.findById(id)
+    const tour = await Tour.findById(id)
 
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                tour,
-            },
-        })
-    } catch (err) {
-        res.status(400).json({
-            status: 'fail',
-            message: err,
-        })
+    if (!tour) {
+        return next(new AppError(`Tour with ID: ${id} is not found`), 404)
     }
-}
 
-const catchAsync = (fn) => {
-    return (req, res, next) => {
-        fn(req, res, next).catch((err) => next(err))
-    }
-}
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            tour,
+        },
+    })
+})
 
 module.exports.createTour = catchAsync(async (req, res, next) => {
     const newTour = await Tour.create(req.body)
@@ -114,13 +107,18 @@ module.exports.createTour = catchAsync(async (req, res, next) => {
     })
 })
 
-module.exports.editTourParamById = catchAsync(async (req, res) => {
+module.exports.editTourParamById = catchAsync(async (req, res, next) => {
     const id = req.params.id
 
     const tour = await Tour.findByIdAndUpdate(id, req.body, {
         new: true,
         runValidators: true,
     })
+
+    if (!tour) {
+        return next(new AppError(`Tour with ID: ${id} is not found`), 404)
+    }
+
     res.status(200).json({
         status: 'success',
         requestTime: req.requestTime,
@@ -130,10 +128,15 @@ module.exports.editTourParamById = catchAsync(async (req, res) => {
     })
 })
 
-module.exports.deleteTour = catchAsync(async (req, res) => {
+module.exports.deleteTour = catchAsync(async (req, res, next) => {
     const id = req.params.id
 
     const tour = await Tour.findByIdAndDelete(id)
+
+    if (!tour) {
+        return next(new AppError(`Tour with ID: ${id} is not found`), 404)
+    }
+
     res.status(200).json({
         status: 'success',
         requestTime: req.requestTime,
@@ -143,7 +146,7 @@ module.exports.deleteTour = catchAsync(async (req, res) => {
     })
 })
 
-module.exports.getToursReport = catchAsync(async (req, res) => {
+module.exports.getToursReport = catchAsync(async (req, res, next) => {
     const report = await Tour.aggregate([
         {
             $match: {
