@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
-var validator = require('validator')
+const validator = require('validator')
 
 const tourSchema = new mongoose.Schema(
     {
@@ -74,10 +74,6 @@ const tourSchema = new mongoose.Schema(
         description: {
             type: String,
             required: false,
-            validate: {
-                validator: validator.isAlpha,
-                message: 'Description shoul be alphabetical',
-            },
         },
         summary: {
             type: String,

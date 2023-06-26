@@ -51,32 +51,24 @@ module.exports.getBestFiveTours = async (req, res, next) => {
     next()
 }
 
-module.exports.getTours = async (req, res, next) => {
-    try {
-        const features = new APIFeatures(Tour.find(), req.query)
-            .filter()
-            .sort()
-            .select()
-            .pagination()
+module.exports.getTours = catchAsync(async (req, res, next) => {
+    const features = new APIFeatures(Tour.find(), req.query)
+        .filter()
+        .sort()
+        .select()
+        .pagination()
 
-        let query = await features.query
+    let query = await features.query
 
-        const tours = await query
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            body: {
-                tours,
-            },
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(404).json({
-            status: 'fail',
-            message: err,
-        })
-    }
-}
+    const tours = await query
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        body: {
+            tours,
+        },
+    })
+})
 
 module.exports.getTourById = catchAsync(async (req, res, next) => {
     const id = req.params.id
