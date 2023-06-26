@@ -4,6 +4,12 @@ const mongoose = require('mongoose')
 dotenv.config({ path: '.env' })
 const app = require('./index')
 
+process.on('uncaughtException', (err) => {
+    console.log('💥 ERROR: uncaughtException 💥')
+    console.log(err)
+    process.exit(1)
+})
+
 const DB = process.env.DB_URL.replace('<PASSWORD>', process.env.DB_PASSWORD)
 
 mongoose.connect(DB).then((db) => {
@@ -18,7 +24,7 @@ const server = app.listen(port, () => {
 })
 
 process.on('unhandledRejection', (err) => {
-    console.log('ERROR 💥')
+    console.log('💥 ERROR: unhandledRejection 💥')
     console.log(err.name, err.message)
     server.close(() => {
         process.exit(1)
