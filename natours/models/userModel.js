@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
             validator: validator.isStrongPassword,
             message: `The password must contain at least 8 characters, including one lowercase letter, one uppercase letter, one number, and one symbol.`,
         },
+        select: false,
     },
     passwordConfirm: {
         type: String,
@@ -58,6 +59,13 @@ userSchema.pre('save', async function (next) {
 
     this.passwordConfirm = undefined
 })
+
+userSchema.methods.correctPassword = async function (
+    candidatePassword,
+    userPassword
+) {
+    return await bcrypt.compare(candidatePassword, userPassword)
+}
 
 const User = mongoose.model('User', userSchema)
 
