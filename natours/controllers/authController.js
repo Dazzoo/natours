@@ -82,6 +82,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
     // CHECK IF USER PASSWORD CHANGED AFTER TOKENN ISSUED
     if (currentUser.changedPasswordAfter(decode.iat)) {
+        console.log(currentUser.changedPasswordAfter(decode.iat))
         return next(
             new AppError(
                 'User recently changed password, please log in again',
