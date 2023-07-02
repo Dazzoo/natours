@@ -17,6 +17,7 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
+        role: req.body.role,
     })
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
@@ -56,6 +57,8 @@ module.exports.login = catchAsync(async (req, res, next) => {
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
     const token = req.headers.token
+    console.log('token', token)
+    console.log('headers', req.headers)
 
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
@@ -95,3 +98,18 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     req.user = currentUser
     next()
 })
+
+module.exports.PermitOnlyTo = (...roles) => {
+    return (req, res, next) => {
+        console.log('HERE', !roles.includes(req.user.role))
+        if (!roles.includes(req.user.role)) {
+            return next(
+                new AppError(
+                    'User does not have permission to use this route',
+                    403
+                )
+            )
+        }
+        next()
+    }
+}

@@ -17,12 +17,16 @@ tourRouter.route('/monthly-plan/:year').get(toursController.getMonthlyReport)
 tourRouter
     .route('/')
     .get(authController.protect, toursController.getTours)
-    .post(toursController.createTour)
+    .post(authController.protect, toursController.createTour)
 
 tourRouter
     .route('/:id')
-    .get(toursController.getTourById)
-    .patch(toursController.editTourParamById)
-    .delete(toursController.deleteTour)
+    .get(authController.protect, toursController.getTourById)
+    .patch(authController.protect, toursController.editTourParamById)
+    .delete(
+        authController.protect,
+        authController.PermitOnlyTo('admin', 'lead-guide'),
+        toursController.deleteTour
+    )
 
 module.exports = tourRouter
