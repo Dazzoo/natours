@@ -8,16 +8,13 @@ const sendEmail = function (props) {
         key: process.env.MAILGUN_API_KEY,
     })
 
-    mg.messages
-        .create('sandbox-123.mailgun.org', {
-            from: 'Yurii Shushanskyi from Natours',
-            to: [props.email],
-            subject: props.subject,
-            text: props.message || null,
-            html: props.html || null,
-        })
-        .then((msg) => console.log(msg)) // logs response data
-        .catch((err) => console.log(err)) // logs any error
+    return mg.messages.create('sandbox-123.mailgun.org', {
+        from: 'Yurii Shushanskyi from Natours',
+        to: [props.email],
+        subject: props.subject,
+        text: props.message || null,
+        html: props.html || null,
+    })
 }
 
 const emailResetMessageText = function (props) {

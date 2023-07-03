@@ -127,7 +127,7 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false })
 
-    sendEmail({
+    const emailResult = await sendEmail({
         email: email,
         subject: 'Password Reset Instructions',
         message: emailResetMessageText({
