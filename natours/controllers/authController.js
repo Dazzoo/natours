@@ -127,14 +127,32 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false })
 
-    const emailResult = await sendEmail({
-        email: email,
-        subject: 'Password Reset Instructions',
-        message: emailResetMessageText({
-            name: user.name,
-            link: `${process.env.BASE_URL}/api/v1/users/reset-password`,
-        }),
-    })
+    try {
+        const emailResult = await sendEmail({
+            email: email,
+            subject: 'Password Reset Instructions',
+            message: emailResetMessageText({
+                name: user.name,
+                link: `${process.env.BASE_URL}/api/v1/users/reset-password`,
+            }),
+        })
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Token sent to email!',
+        })
+    } catch (err) {
+        user.passwordResetToken = undefined
+        user.passwordResetExpiresAt = undefined
+        user.save({ validateBeforeSave: false })
+
+        return next(
+            AppError(
+                'There was an error sending email. Please try again later',
+                500
+            )
+        )
+    }
 
     next()
 })
