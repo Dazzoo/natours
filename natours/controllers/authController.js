@@ -3,6 +3,8 @@ const { promisify } = require('util')
 const User = require('../models/userModel')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
+const { sendEmail, emailResetMessageText } = require('../utility/email')
+const { env } = require('process')
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -17,7 +19,6 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
-        role: req.body.role,
     })
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
@@ -113,3 +114,27 @@ module.exports.PermitOnlyTo = (...roles) => {
         next()
     }
 }
+
+module.exports.forgotPassword = catchAsync(async (req, res, next) => {
+    const email = req.body.email
+    const user = await User.findOne({ email })
+
+    if (!user) {
+        return next(AppError('There is no user with this email address'), 404)
+    }
+
+    const resetToken = user.changedPasswordResetToken()
+
+    await user.save({ validateBeforeSave: false })
+
+    sendEmail({
+        email: email,
+        subject: 'Password Reset Instructions',
+        message: emailResetMessageText({
+            name: user.name,
+            link: `${process.env.BASE_URL}/api/v1/users/reset-password`,
+        }),
+    })
+
+    next()
+})
