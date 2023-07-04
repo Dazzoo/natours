@@ -120,7 +120,10 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
     const user = await User.findOne({ email })
 
     if (!user) {
-        return next(AppError('There is no user with this email address'), 404)
+        return next(
+            new AppError('There is no user with this email address'),
+            404
+        )
     }
 
     const resetToken = user.changedPasswordResetToken()
@@ -142,12 +145,13 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
             message: 'Token sent to email!',
         })
     } catch (err) {
+        console.log(err)
         user.passwordResetToken = undefined
         user.passwordResetExpiresAt = undefined
         user.save({ validateBeforeSave: false })
 
         return next(
-            AppError(
+            new AppError(
                 'There was an error sending email. Please try again later',
                 500
             )
