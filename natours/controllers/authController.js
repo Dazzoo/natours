@@ -149,7 +149,7 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
         console.log(err)
         user.passwordResetToken = undefined
         user.passwordResetExpiresAt = undefined
-        user.save({ validateBeforeSave: false })
+        await user.save({ validateBeforeSave: false })
 
         return next(
             new AppError(
@@ -180,16 +180,48 @@ module.exports.resetPassword = catchAsync(async (req, res, next) => {
     if (!user) {
         return next(new AppError('Token is invalid or has expired', 400))
     }
+
     user.password = req.body.password
     user.passwordConfirm = req.body.passwordConfirm
     user.passwordResetToken = undefined
     user.passwordResetExpiresAt = undefined
-    user.save()
+    await user.save()
 
     const token = signToken(user._id)
 
     res.status(200).json({
         message: 'success',
         token,
+    })
+})
+
+module.exports.updatePassword = catchAsync(async (req, res, next) => {
+    const token = req.headers.token
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+    const user = await User.findOne({ _id: decoded.id }).select('+password')
+
+    if (
+        !user ||
+        !(await user.correctPassword(req.body.password, user.password))
+    ) {
+        return next(
+            new AppError('User password is wrong or token has expired'),
+            400
+        )
+    }
+    console.log(user)
+
+    user.password = req.body.passwordNew
+    user.passwordConfirm = req.body.passwordConfirmNew
+    user.passwordChangedAt = Date.now() - 2000
+    await user.save()
+
+    const newToken = signToken(user._id)
+
+    res.status(200).json({
+        message: 'success',
+        token: newToken,
     })
 })
