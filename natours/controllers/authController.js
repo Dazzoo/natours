@@ -21,10 +21,7 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
     })
-
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES,
-    })
+    const token = signToken(newUser._id)
 
     res.status(201).json({
         status: 'success',
@@ -202,6 +199,8 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
 
     const user = await User.findOne({ _id: decoded.id }).select('+password')
 
+    console.log('123', token)
+
     if (
         !user ||
         !(await user.correctPassword(req.body.password, user.password))
@@ -211,7 +210,6 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
             400
         )
     }
-    console.log(user)
 
     user.password = req.body.passwordNew
     user.passwordConfirm = req.body.passwordConfirmNew
