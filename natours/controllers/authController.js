@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const User = require('../models/userModel')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
+const filterObject = require('../utility/filterObject')
 const { sendEmail, emailResetMessageText } = require('../utility/email')
 const { env } = require('process')
 
@@ -56,8 +57,6 @@ module.exports.login = catchAsync(async (req, res, next) => {
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
     const token = req.headers.token
-    console.log('token', token)
-    console.log('headers', req.headers)
 
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
@@ -71,7 +70,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
     // CHECK IF USER IS STILL EXISTS
 
-    const currentUser = await User.findById(decode.id)
+    const currentUser = await User.findById(decode.id).select('+password')
 
     if (!currentUser) {
         return next(
@@ -161,13 +160,10 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
 
 module.exports.resetPassword = catchAsync(async (req, res, next) => {
     const resetToken = req.params.token
-    console.log('resetToken', resetToken)
     const resetTokenEncrypted = crypto
         .createHash('sha256')
         .update(resetToken)
         .digest('hex')
-
-    console.log('resetTokenEncrypted', resetTokenEncrypted)
 
     const user = await User.findOne({
         passwordResetToken: resetTokenEncrypted,
@@ -212,7 +208,7 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
     }
 
     user.password = req.body.passwordNew
-    user.passwordConfirm = req.body.passwordConfirmNew
+    user.passwordConfirm = req.body.passwordConfirmNe
     user.passwordChangedAt = Date.now() - 2000
     await user.save()
 
@@ -221,5 +217,28 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
     res.status(200).json({
         message: 'success',
         token: newToken,
+    })
+})
+
+module.exports.updateMe = catchAsync(async (req, res, next) => {
+    const filteredRequest = filterObject(req.body, 'name', 'email')
+    console.log(req.password, req.user.password)
+
+    if (
+        !(await req.user.correctPassword(req.body.password, req.user.password))
+    ) {
+        return next(new AppError('Not correct password'), 400)
+    }
+
+    const newUser = await User.findByIdAndUpdate(req.user.id, filteredRequest, {
+        runValidators: true,
+        new: true,
+    })
+
+    res.status(200).json({
+        message: 'success',
+        data: {
+            user: newUser,
+        },
     })
 })
