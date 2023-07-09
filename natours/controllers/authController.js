@@ -14,6 +14,30 @@ const signToken = (id) => {
     })
 }
 
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user.id)
+
+    console.log(process.env.JWT_COOKIE_EXPIRES_IN)
+
+    const cookieOptions = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true,
+    }
+    if (process.env.NODE_ENVIROMENT) cookieOptions.secure = true
+
+    res.cookie('jwt', token, cookieOptions)
+
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: {
+            user: user,
+        },
+    })
+}
+
 module.exports.signup = catchAsync(async (req, res, next) => {
     const newUser = await User.create({
         name: req.body.name,
@@ -22,15 +46,7 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
     })
-    const token = signToken(newUser._id)
-
-    res.status(201).json({
-        status: 'success',
-        token,
-        data: {
-            user: newUser,
-        },
-    })
+    createSendToken(201, newUser, res)
 })
 
 module.exports.login = catchAsync(async (req, res, next) => {
@@ -46,12 +62,7 @@ module.exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Incorrect email or password'), 401)
     }
 
-    const token = signToken(user._id)
-
-    res.status(201).json({
-        status: 'success',
-        token,
-    })
+    createSendToken(201, user, res)
 })
 
 module.exports.protect = catchAsync(async (req, res, next) => {
@@ -180,12 +191,7 @@ module.exports.resetPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpiresAt = undefined
     await user.save()
 
-    const token = signToken(user._id)
-
-    res.status(200).json({
-        message: 'success',
-        token,
-    })
+    createSendToken(201, user, res)
 })
 
 module.exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -239,6 +245,20 @@ module.exports.updateMe = catchAsync(async (req, res, next) => {
         message: 'success',
         data: {
             user: newUser,
+        },
+    })
+})
+
+module.exports.deleteMe = catchAsync(async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(req.user.id, {
+        active: false,
+    })
+    console.log(user)
+
+    res.status(200).json({
+        message: 'success',
+        data: {
+            user: user,
         },
     })
 })

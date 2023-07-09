@@ -57,9 +57,19 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'lead-guide', 'guide', 'user'],
         default: 'user',
     },
+    active: {
+        type: Boolean,
+        default: true,
+        select: false,
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpiresAt: Date,
+})
+
+userSchema.pre(/^find/, function (next) {
+    this.find({ active: { $ne: false } })
+    next()
 })
 
 userSchema.pre('save', async function (next) {
