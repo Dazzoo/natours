@@ -1,6 +1,10 @@
 const express = require('express')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
 const AppError = require('./utility/appError')
@@ -8,7 +12,19 @@ const globalErrorHandler = require('./controllers/errorController')
 
 const app = express()
 
-/// MIDDLEWARE
+/// MIDDLEWARES
+
+/// 1) Set security HTTP headers
+
+app.use(helmet())
+
+/// 2) DEV middlewares
+
+if (process.env.NODE_ENVIROMENT === 'development') {
+    app.use(morgan('dev'))
+}
+
+/// 3) Limit api requests
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -19,13 +35,21 @@ const limiter = rateLimit({
 
 app.use('/api', limiter)
 
-app.use(express.json())
+// 4) Transform request ot js and limit size
+
+app.use(express.json({ limit: '10kb' }))
+
+// 5) Sanitize the request data to protect against malicious queries to the database.
+
+app.use(mongoSanitize())
+
+// 5) Sanitize the request data to protect against html
+
+app.use(xss())
 
 app.use(express.static(`${__dirname}/public`))
 
-if (process.env.NODE_ENVIROMENT === 'development') {
-    app.use(morgan('dev'))
-}
+// 6) Testing middleware
 
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString()

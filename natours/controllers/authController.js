@@ -6,7 +6,6 @@ const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
 const filterObject = require('../utility/filterObject')
 const { sendEmail, emailResetMessageText } = require('../utility/email')
-const { env } = require('process')
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -14,10 +13,8 @@ const signToken = (id) => {
     })
 }
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (statusCode, user, res) => {
     const token = signToken(user.id)
-
-    console.log(process.env.JWT_COOKIE_EXPIRES_IN)
 
     const cookieOptions = {
         expires: new Date(
@@ -25,10 +22,11 @@ const createSendToken = (user, statusCode, res) => {
         ),
         httpOnly: true,
     }
-    if (process.env.NODE_ENVIROMENT === 'production')
-        cookieOptions.secure = true
 
     res.cookie('jwt', token, cookieOptions)
+
+    if (process.env.NODE_ENVIROMENT === 'production')
+        cookieOptions.secure = true
 
     res.status(statusCode).json({
         status: 'success',
@@ -47,6 +45,7 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
     })
+    console.log(process.env.JWT_COOKIE_EXPIRES_IN)
     createSendToken(201, newUser, res)
 })
 
