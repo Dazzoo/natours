@@ -102,7 +102,7 @@ module.exports.createTour = catchAsync(async (req, res, next) => {
 module.exports.editTourParamById = catchAsync(async (req, res, next) => {
     const id = req.params.id
 
-    const tour = await Tour.findByIdAndUpdate(id, req.body, {
+    const tour = await Tour.findOneAndUpdate({ _id: id }, req.body, {
         new: true,
         runValidators: true,
     })
