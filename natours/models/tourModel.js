@@ -116,9 +116,12 @@ const tourSchema = new mongoose.Schema(
                 day: Number,
             },
         ],
-        guides: {
-            type: Array,
-        },
+        guides: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: 'User',
+            },
+        ],
     },
     {
         toJSON: { virtuals: true },
@@ -136,22 +139,22 @@ tourSchema.pre('save', function (next) {
     next()
 })
 
-// EMBED TOUR GUIDES BY ID
-tourSchema.pre('save', async function (next) {
-    const guidesPromises = this.guides.map(
-        async (id) => await User.findById(id)
-    )
-    this.guides = await Promise.all(guidesPromises)
-    next()
-})
+// // EMBED TOUR GUIDES BY ID
+// tourSchema.pre('save', async function (next) {
+//     const guidesPromises = this.guides.map(
+//         async (id) => await User.findById(id)
+//     )
+//     this.guides = await Promise.all(guidesPromises)
+//     next()
+// })
 
-tourSchema.pre(/find|Update/gi, async function (next) {
-    const guidesPromises = this._update.guides.map(
-        async (id) => await User.findById(id)
-    )
-    this._update.guides = await Promise.all(guidesPromises)
-    next()
-})
+// tourSchema.pre(/find|Update/gi, async function (next) {
+//     const guidesPromises = this._update.guides.map(
+//         async (id) => await User.findById(id)
+//     )
+//     this._update.guides = await Promise.all(guidesPromises)
+//     next()
+// })
 
 /// QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
@@ -162,6 +165,11 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.post(/^find/, function (doc, next) {
     console.log(`Query took ${Date.now() - this.start} ms`)
+    next()
+})
+
+tourSchema.pre(/^find/, function (next) {
+    this.populate({ path: 'guides' })
     next()
 })
 
