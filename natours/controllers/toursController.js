@@ -44,12 +44,12 @@ const AppError = require('../utility/appError')
 
 ///
 
-module.exports.getBestFiveTours = async (req, res, next) => {
+module.exports.getBestFiveTours = catchAsync(async (req, res, next) => {
     req.query.limit = '5'
     req.query.sort = '-price,rating'
     req.query.fields = 'name,price,rating'
     next()
-}
+})
 
 module.exports.getTours = catchAsync(async (req, res, next) => {
     const features = new APIFeatures(Tour.find(), req.query)

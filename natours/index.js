@@ -7,6 +7,7 @@ const xss = require('xss-clean')
 
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
+const reviewsRouter = require('./routes/reviewsRoutes')
 const AppError = require('./utility/appError')
 const globalErrorHandler = require('./controllers/errorController')
 
@@ -61,6 +62,8 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter)
 
 app.use('/api/v1/users', usersRouter)
+
+app.use('/api/v1/reviews', reviewsRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on the server`, 404))
