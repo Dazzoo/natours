@@ -50,10 +50,8 @@ reviewSchema.pre(/^find/, function (next) {
 reviewSchema.pre(/^find/, function (next) {
     this.populate([
         {
-            path: 'tour',
-        },
-        {
             path: 'user',
+            select: 'name photo',
         },
     ])
     next()

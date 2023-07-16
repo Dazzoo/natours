@@ -4,6 +4,10 @@ const catchAsync = require('../utility/catchAsync')
 
 module.exports.getReviews = catchAsync(async (req, res, next) => {
     const features = new ApiFeatures(Review.find(), req.body)
+        .filter()
+        .sort()
+        .select()
+        .pagination()
 
     const reviews = await features.query
 
