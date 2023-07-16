@@ -158,7 +158,7 @@ tourSchema.pre('save', function (next) {
 
 /// QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
-    this.find({ secretTour: { $ne: true } })
+    this.find({ secretTour: { $ne: true } }).select('-__v')
     this.start = Date.now()
     next()
 })
