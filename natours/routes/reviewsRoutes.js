@@ -9,4 +9,6 @@ reviewRouter
     .get(authController.protect, reviewsController.getReviews)
     .post(authController.protect, reviewsController.createReview)
 
+reviewRouter.route('/:id').delete(reviewsController.deleteReview)
+
 module.exports = reviewRouter

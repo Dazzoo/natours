@@ -4,6 +4,7 @@ const { query } = require('express')
 const APIFeatures = require('./../utility/apiFeatures')
 const catchAsync = require('./../utility/catchAsync')
 const AppError = require('../utility/appError')
+const factory = require('./handlerFactory')
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -120,24 +121,6 @@ module.exports.editTourParamById = catchAsync(async (req, res, next) => {
     })
 })
 
-module.exports.deleteTour = catchAsync(async (req, res, next) => {
-    const id = req.params.id
-
-    const tour = await Tour.findByIdAndDelete(id)
-
-    if (!tour) {
-        return next(new AppError(`Tour with ID: ${id} is not found`), 404)
-    }
-
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            tour,
-        },
-    })
-})
-
 module.exports.getToursReport = catchAsync(async (req, res, next) => {
     const report = await Tour.aggregate([
         {
@@ -213,3 +196,5 @@ module.exports.getMonthlyReport = catchAsync(async (req, res) => {
         },
     })
 })
+
+module.exports.deleteTour = factory.deleteOne(Tour)
