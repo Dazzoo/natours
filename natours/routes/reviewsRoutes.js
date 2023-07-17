@@ -1,12 +1,12 @@
 const express = require('express')
-const reviewController = require('../controllers/reviewsController')
+const reviewsController = require('../controllers/reviewsController')
 const authController = require('../controllers/authController')
 
 const reviewRouter = express.Router()
 
 reviewRouter
     .route('/')
-    .get(authController.protect, reviewController.getReviews)
-    .post(authController.protect, reviewController.createReview)
+    .get(authController.protect, reviewsController.getReviews)
+    .post(authController.protect, reviewsController.createReview)
 
 module.exports = reviewRouter
