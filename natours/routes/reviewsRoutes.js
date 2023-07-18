@@ -7,8 +7,14 @@ const reviewRouter = express.Router({ mergeParams: true })
 reviewRouter
     .route('/')
     .get(authController.protect, reviewsController.getReviews)
-    .post(authController.protect, reviewsController.createReview)
+    .post(
+        authController.protect,
+        reviewsController.createReviewParams,
+        reviewsController.createReview
+    )
 
-reviewRouter.route('/:id').delete(reviewsController.deleteReview)
-
+reviewRouter
+    .route('/:id')
+    .patch(reviewsController.editReviewParamById)
+    .delete(reviewsController.deleteReview)
 module.exports = reviewRouter

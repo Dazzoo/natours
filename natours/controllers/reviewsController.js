@@ -20,18 +20,14 @@ module.exports.getReviews = catchAsync(async (req, res, next) => {
     next()
 })
 
-module.exports.createReview = catchAsync(async (req, res, next) => {
+module.exports.createReviewParams = catchAsync(async (req, res, next) => {
     if (!req.body.tour) req.body.tour = req.params.tourId
     if (!req.body.user) req.body.user = req.user._id
-    const review = await Review.create(req.body)
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            review,
-        },
-    })
     next()
 })
+
+module.exports.createReview = factory.createOne(Review)
+
+module.exports.editReviewParamById = factory.updateOne(Review)
 
 module.exports.deleteReview = factory.deleteOne(Review)

@@ -89,37 +89,9 @@ module.exports.getTourById = catchAsync(async (req, res, next) => {
     })
 })
 
-module.exports.createTour = catchAsync(async (req, res, next) => {
-    const newTour = await Tour.create(req.body)
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            newTour,
-        },
-    })
-})
+module.exports.createTour = factory.createOne(Tour)
 
-module.exports.editTourParamById = catchAsync(async (req, res, next) => {
-    const id = req.params.id
-
-    const tour = await Tour.findOneAndUpdate({ _id: id }, req.body, {
-        new: true,
-        runValidators: true,
-    })
-
-    if (!tour) {
-        return next(new AppError(`Tour with ID: ${id} is not found`), 404)
-    }
-
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            tour,
-        },
-    })
-})
+module.exports.editTourParamById = factory.updateOne(Tour)
 
 module.exports.getToursReport = catchAsync(async (req, res, next) => {
     const report = await Tour.aggregate([
