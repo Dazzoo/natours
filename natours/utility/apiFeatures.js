@@ -18,7 +18,7 @@ class APIFeatures {
             (match) => `$${match}`
         )
         console.log('queryString', queryString)
-        this.query = Tour.find(JSON.parse(queryString))
+        this.query = this.query.find(JSON.parse(queryString))
         return this
     }
 
@@ -52,7 +52,7 @@ class APIFeatures {
         this.query = this.query.skip(skip).limit(limit)
 
         if (this.queryString.page) {
-            const countDocuments = Tour.countDocuments()
+            const countDocuments = this.query.countDocuments()
             if (skip >= countDocuments)
                 throw Error(`Page ${page} does not exist`)
         }

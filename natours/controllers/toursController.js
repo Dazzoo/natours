@@ -52,24 +52,7 @@ module.exports.getBestFiveTours = catchAsync(async (req, res, next) => {
     next()
 })
 
-module.exports.getTours = catchAsync(async (req, res, next) => {
-    const features = new APIFeatures(Tour.find(), req.query)
-        .filter()
-        .sort()
-        .select()
-        .pagination()
-
-    let query = await features.query
-
-    const tours = await query
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            tours,
-        },
-    })
-})
+module.exports.getTours = factory.getAll(Tour)
 
 module.exports.getTourById = catchAsync(async (req, res, next) => {
     const id = req.params.id
@@ -92,6 +75,8 @@ module.exports.getTourById = catchAsync(async (req, res, next) => {
 module.exports.createTour = factory.createOne(Tour)
 
 module.exports.editTourParamById = factory.updateOne(Tour)
+
+module.exports.deleteTour = factory.deleteOne(Tour)
 
 module.exports.getToursReport = catchAsync(async (req, res, next) => {
     const report = await Tour.aggregate([
@@ -168,5 +153,3 @@ module.exports.getMonthlyReport = catchAsync(async (req, res) => {
         },
     })
 })
-
-module.exports.deleteTour = factory.deleteOne(Tour)

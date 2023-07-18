@@ -3,22 +3,7 @@ const ApiFeatures = require('../utility/apiFeatures')
 const catchAsync = require('../utility/catchAsync')
 const factory = require('./handlerFactory')
 
-module.exports.getReviews = catchAsync(async (req, res, next) => {
-    let filter = {}
-    if (req.params.tourId) filter = { tour: req.params.tourId }
-    const features = new ApiFeatures(Review.find(filter), req.body)
-
-    const reviews = await features.query
-
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            reviews,
-        },
-    })
-    next()
-})
+module.exports.getReviews = factory.getAll(Review)
 
 module.exports.createReviewParams = catchAsync(async (req, res, next) => {
     if (!req.body.tour) req.body.tour = req.params.tourId
