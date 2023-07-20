@@ -15,6 +15,7 @@ reviewRouter
 
 reviewRouter
     .route('/:id')
+    .get(reviewsController.getReviewById)
     .patch(reviewsController.editReviewParamById)
     .delete(reviewsController.deleteReview)
 module.exports = reviewRouter

@@ -5,15 +5,15 @@ const factory = require('./handlerFactory')
 
 module.exports.getUsers = factory.getAll(User)
 
-module.exports.getUserById = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not defined',
-    })
-}
+module.exports.getUserById = factory.getOne(User)
 
 module.exports.createUser = factory.createOne(User)
 
 module.exports.editUserParamById = factory.updateOne(User)
 
 module.exports.deleteUser = factory.deleteOne(User)
+
+module.exports.getMe = catchAsync(async (req, res, next) => {
+    req.params.id = req.user._id
+    next()
+})

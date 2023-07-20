@@ -1,6 +1,7 @@
 const catchAsync = require('../utility/catchAsync')
 const AppError = require('../utility/appError')
 const APIFeatures = require('../utility/apiFeatures')
+const { populate } = require('../models/userModel')
 
 module.exports.getAll = (Model) =>
     catchAsync(async (req, res, next) => {
@@ -15,6 +16,32 @@ module.exports.getAll = (Model) =>
             .pagination()
 
         const doc = await features.query
+
+        res.status(200).json({
+            status: 'success',
+            requestTime: req.requestTime,
+            data: {
+                data: doc,
+            },
+        })
+    })
+
+module.exports.getOne = (Model, populateOptions) =>
+    catchAsync(async (req, res, next) => {
+        const id = req.params.id
+
+        let doc = await Model.findById(id)
+
+        if (populateOptions) {
+            doc = await doc.populate(populateOptions)
+        }
+
+        if (!doc) {
+            return next(
+                new AppError(`Document with ID: ${id} is not found`),
+                404
+            )
+        }
 
         res.status(200).json({
             status: 'success',

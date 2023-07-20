@@ -45,32 +45,9 @@ const factory = require('./handlerFactory')
 
 ///
 
-module.exports.getBestFiveTours = catchAsync(async (req, res, next) => {
-    req.query.limit = '5'
-    req.query.sort = '-price,rating'
-    req.query.fields = 'name,price,rating'
-    next()
-})
-
 module.exports.getTours = factory.getAll(Tour)
 
-module.exports.getTourById = catchAsync(async (req, res, next) => {
-    const id = req.params.id
-
-    const tour = await Tour.findById(id).populate({ path: 'reviews' })
-
-    if (!tour) {
-        return next(new AppError(`Tour with ID: ${id} is not found`), 404)
-    }
-
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        body: {
-            tour,
-        },
-    })
-})
+module.exports.getTourById = factory.getOne(Tour, { path: 'reviews' })
 
 module.exports.createTour = factory.createOne(Tour)
 
@@ -152,4 +129,11 @@ module.exports.getMonthlyReport = catchAsync(async (req, res) => {
             MonthlyReport,
         },
     })
+})
+
+module.exports.getBestFiveTours = catchAsync(async (req, res, next) => {
+    req.query.limit = '5'
+    req.query.sort = '-price,rating'
+    req.query.fields = 'name,price,rating'
+    next()
 })

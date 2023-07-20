@@ -25,6 +25,13 @@ usersRouter.delete(
     authController.deleteMe
 )
 
+usersRouter.get(
+    '/me',
+    authController.protect,
+    usersController.getMe,
+    usersController.getUserById
+)
+
 usersRouter
     .route('/')
     .get(usersController.getUsers)
