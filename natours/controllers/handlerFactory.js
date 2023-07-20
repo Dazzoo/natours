@@ -35,6 +35,7 @@ module.exports.getOne = (Model, populateOptions) =>
         if (populateOptions) {
             doc = await doc.populate(populateOptions)
         }
+        // .populate({ path: 'reviews' })
 
         if (!doc) {
             return next(

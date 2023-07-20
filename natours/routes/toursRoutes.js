@@ -7,6 +7,29 @@ const tourRouter = express.Router()
 
 // tourRouter.param('id', toursController.checkId)
 
+tourRouter
+    .route('/')
+    .get(toursController.getTours)
+    .post(
+        authController.protect,
+        authController.PermitOnlyTo('admin', 'lead-guide'),
+        toursController.createTour
+    )
+
+tourRouter.use(authController.protect)
+
+tourRouter
+    .route('/:id')
+    .get(toursController.getTourById)
+    .patch(
+        authController.PermitOnlyTo('admin', 'lead-guide'),
+        toursController.editTourParamById
+    )
+    .delete(
+        authController.PermitOnlyTo('admin', 'lead-guide'),
+        toursController.deleteTour
+    )
+
 tourRouter.use('/:tourId/reviews', reviewsRouter)
 
 tourRouter
@@ -16,20 +39,5 @@ tourRouter
 tourRouter.route('/report').get(toursController.getToursReport)
 
 tourRouter.route('/monthly-plan/:year').get(toursController.getMonthlyReport)
-
-tourRouter
-    .route('/')
-    .get(authController.protect, toursController.getTours)
-    .post(authController.protect, toursController.createTour)
-
-tourRouter
-    .route('/:id')
-    .get(authController.protect, toursController.getTourById)
-    .patch(authController.protect, toursController.editTourParamById)
-    .delete(
-        authController.protect,
-        authController.PermitOnlyTo('admin', 'lead-guide'),
-        toursController.deleteTour
-    )
 
 module.exports = tourRouter

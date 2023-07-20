@@ -8,6 +8,9 @@ usersRouter.post('/signup', authController.signup)
 usersRouter.post('/login', authController.login)
 usersRouter.post('/forgot-password', authController.forgotPassword)
 usersRouter.patch('/reset-password/:token', authController.resetPassword)
+
+usersRouter.use(authController.protect)
+
 usersRouter.patch(
     '/update-password',
     authController.protect,
@@ -31,6 +34,8 @@ usersRouter.get(
     usersController.getMe,
     usersController.getUserById
 )
+
+usersRouter.use(authController.PermitOnlyTo('admin'))
 
 usersRouter
     .route('/')
