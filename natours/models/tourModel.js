@@ -163,6 +163,12 @@ tourSchema.pre('save', function (next) {
 //     next()
 // })
 
+/// INDEX
+
+tourSchema.index({ price: 1, ratingAverage: -1 })
+
+tourSchema.index({ slug: 1 })
+
 /// QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
     this.find({ secretTour: { $ne: true } }).select('-__v')
