@@ -95,7 +95,7 @@ module.exports.deleteOne = (Model) =>
     catchAsync(async (req, res, next) => {
         const id = req.params.id
 
-        const doc = await Model.findByIdAndDelete(id)
+        const doc = await Model.findOneAndDelete({ _id: id })
 
         if (!doc) {
             return next(

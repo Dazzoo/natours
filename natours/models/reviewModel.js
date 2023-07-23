@@ -46,6 +46,7 @@ const reviewSchema = new mongoose.Schema(
 // STATIC
 
 reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
+    console.log(tourId)
     const stats = await this.aggregate([
         {
             $match: { tour: tourId },
@@ -68,9 +69,32 @@ reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
     )
 }
 
+// reviewSchema.pre(/^findOneAnd/, async function (next) {
+//     this.r = await this.findOne()
+//     console.log(this.r)
+//     next()
+// })
+
+// calculateReviewsAverage
+
 reviewSchema.post('save', function () {
     this.constructor.calculateReviewsAverage(this.tour)
+    console.log('save')
 })
+
+reviewSchema.pre('findOneAndUpdate', function (next) {
+    console.log('findOneAndUpdate')
+    this.isFindOneAndUpdate = true
+    next()
+})
+
+reviewSchema.post('find', function (doc) {
+    if (this.isFindOneAndUpdate) {
+        this.model.calculateReviewsAverage(doc.tour)
+    }
+})
+
+//________________________
 
 reviewSchema.pre(/^find/, function (next) {
     this.find().select('-__v')
