@@ -33,7 +33,7 @@ module.exports.getOne = (Model, populateOptions) =>
 
         let doc = await Model.findById(id)
 
-        if (populateOptions) {
+        if (populateOptions && doc) {
             doc = await doc.populate(populateOptions)
         }
         // .populate({ path: 'reviews' })

@@ -60,13 +60,23 @@ reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
         },
     ])
 
-    await Tour.findOneAndUpdate(
-        { _id: tourId },
-        {
-            ratingsQuantity: stats[0].ratingsQuantity,
-            ratingsAverage: stats[0].ratingsAverage,
-        }
-    )
+    if (stats.length > 0) {
+        await Tour.findOneAndUpdate(
+            { _id: tourId },
+            {
+                ratingsQuantity: stats[0].ratingsQuantity,
+                ratingsAverage: stats[0].ratingsAverage,
+            }
+        )
+    } else {
+        await Tour.findOneAndUpdate(
+            { _id: tourId },
+            {
+                ratingsQuantity: 0,
+                ratingsAverage: 4.5,
+            }
+        )
+    }
 }
 
 // reviewSchema.pre(/^findOneAnd/, async function (next) {
@@ -75,7 +85,7 @@ reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
 //     next()
 // })
 
-// calculateReviewsAverage
+// save, findAndUpdate, findAndDelete
 
 reviewSchema.post('save', function () {
     this.constructor.calculateReviewsAverage(this.tour)
@@ -83,14 +93,23 @@ reviewSchema.post('save', function () {
 })
 
 reviewSchema.pre('findOneAndUpdate', function (next) {
-    console.log('findOneAndUpdate')
-    this.isFindOneAndUpdate = true
+    this.middlewareMethodName = 'findOneAndUpdate'
+    next()
+})
+
+reviewSchema.pre('findOneAndDelete', async function (next) {
+    this.doc = await this.model.findOne(this.getFilter())
+    this.middlewareMethodName = 'findOneAndDelete'
     next()
 })
 
 reviewSchema.post('find', function (doc) {
-    if (this.isFindOneAndUpdate) {
+    if (this.middlewareMethodName === 'findOneAndUpdate') {
         this.model.calculateReviewsAverage(doc.tour)
+    } else if (this.middlewareMethodName === 'findOneAndDelete') {
+        if (this.doc.tour) {
+            this.model.calculateReviewsAverage(this.doc.tour)
+        }
     }
 })
 
