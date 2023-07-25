@@ -170,6 +170,8 @@ tourSchema.index({ price: 1, ratingAverage: -1 })
 
 tourSchema.index({ slug: 1 })
 
+tourSchema.index({ startLocation: '2dsphere' })
+
 /// QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
     this.find({ secretTour: { $ne: true } }).select('-__v')
@@ -189,7 +191,7 @@ tourSchema.pre(/^find/, function (next) {
 
 /// AGGREGATE MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
-    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
+    // this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
     next()
 })
 

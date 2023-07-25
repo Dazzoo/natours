@@ -137,3 +137,52 @@ module.exports.getBestFiveTours = catchAsync(async (req, res, next) => {
     req.query.fields = 'name,price,rating'
     next()
 })
+
+module.exports.getToursWithinRadius = catchAsync(async (req, res, next) => {
+    const { lanlon, distance, units } = req.params
+    const supportedUnits = ['km', 'mi']
+
+    const lan = lanlon.split(',')[0]
+    const lon = lanlon.split(',')[1]
+    console.log(units)
+
+    if (!lan || !lon) {
+        return next(
+            new AppError(
+                'Please provide the correct Latitude and Longitude',
+                400
+            )
+        )
+    }
+    if (!distance) {
+        return next(new AppError('Please provide the correct Radius', 400))
+    }
+    if (!supportedUnits.includes(units)) {
+        return next(new AppError('Units should be either km or mi', 400))
+    }
+
+    let radius
+
+    if (units === 'km') {
+        const radiusOfEarthKm = 6371
+        radius = distance / radiusOfEarthKm
+    } else {
+        const radiusOfEarthMiles = 3959
+        radius = distance / radiusOfEarthMiles
+    }
+
+    const doc = await Tour.find({
+        startLocation: {
+            $geoWithin: {
+                $centerSphere: [[lon, lan], radius],
+            },
+        },
+    })
+
+    res.status(200).json({
+        success: 'success',
+        data: {
+            data: doc,
+        },
+    })
+})

@@ -40,4 +40,8 @@ tourRouter.route('/report').get(toursController.getToursReport)
 
 tourRouter.route('/monthly-plan/:year').get(toursController.getMonthlyReport)
 
+tourRouter
+    .route('/within/:distance/center/:lanlon/units/:units')
+    .get(toursController.getToursWithinRadius)
+
 module.exports = tourRouter
