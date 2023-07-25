@@ -144,7 +144,6 @@ module.exports.getToursWithinRadius = catchAsync(async (req, res, next) => {
 
     const lan = lanlon.split(',')[0]
     const lon = lanlon.split(',')[1]
-    console.log(units)
 
     if (!lan || !lon) {
         return next(
@@ -185,4 +184,53 @@ module.exports.getToursWithinRadius = catchAsync(async (req, res, next) => {
             data: doc,
         },
     })
+})
+
+module.exports.getToursNearSort = catchAsync(async (req, res, next) => {
+    const { lanlon, units } = req.params
+
+    const supportedUnits = ['km', 'mi']
+
+    const lan = lanlon.split(',')[0]
+    const lon = lanlon.split(',')[1]
+
+    if (!lan || !lon) {
+        return next(
+            new AppError(
+                'Please provide the correct Latitude and Longitude',
+                400
+            )
+        )
+    }
+    if (!supportedUnits.includes(units)) {
+        return next(new AppError('Units should be either km or mi', 400))
+    }
+
+    const doc = await Tour.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type: 'Point',
+                    coordinates: [lon * 1, lan * 1],
+                },
+                spherical: true,
+                distanceField: 'distanceToLocation',
+                distanceMultiplier: units === 'mi' ? 0.000621371 : 0.001,
+            },
+        },
+        {
+            $project: {
+                distanceToLocation: 1,
+                name: 1,
+            },
+        },
+    ])
+
+    res.status(200).json({
+        success: 'success',
+        data: {
+            data: doc,
+        },
+    })
+    next()
 })

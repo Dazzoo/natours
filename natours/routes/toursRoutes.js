@@ -44,4 +44,8 @@ tourRouter
     .route('/within/:distance/center/:lanlon/units/:units')
     .get(toursController.getToursWithinRadius)
 
+tourRouter
+    .route('/center/:lanlon/units/:units')
+    .get(toursController.getToursNearSort)
+
 module.exports = tourRouter
