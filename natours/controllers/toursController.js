@@ -234,3 +234,24 @@ module.exports.getToursNearSort = catchAsync(async (req, res, next) => {
     })
     next()
 })
+
+module.exports.getTourBySlug = catchAsync(async (req, res, next) => {
+    const slug = req.params.slug
+
+    const doc = await Tour.findOne({ slug })
+
+    if (!doc) {
+        return next(
+            new AppError(`Document with Slug: ${slug} is not found`),
+            404
+        )
+    }
+
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        data: {
+            data: doc,
+        },
+    })
+})

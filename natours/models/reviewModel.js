@@ -67,7 +67,7 @@ reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
             { _id: tourId },
             {
                 ratingsQuantity: stats[0].ratingsQuantity,
-                ratingsAverage: stats[0].ratingsAverage,
+                ratingsAverage: stats[0].ratingsAverage.toFixed(2),
             }
         )
     } else {

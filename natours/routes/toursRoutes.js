@@ -16,6 +16,8 @@ tourRouter
         toursController.createTour
     )
 
+tourRouter.route('/params/:slug').get(toursController.getTourBySlug)
+
 tourRouter.use(authController.protect)
 
 tourRouter
