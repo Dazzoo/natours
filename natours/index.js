@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
+const cors = require('cors')
 
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
@@ -18,6 +19,13 @@ const app = express()
 /// 1) Set security HTTP headers
 
 app.use(helmet())
+
+const corsOptions = {
+    origin: `${process.env.FRONTEND_URL}`, // Replace with your frontend's URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+}
+
+app.use(cors(corsOptions))
 
 /// 2) DEV middlewares
 
