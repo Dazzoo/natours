@@ -5,6 +5,7 @@ const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
@@ -23,6 +24,7 @@ app.use(helmet())
 const corsOptions = {
     origin: `${process.env.FRONTEND_URL}`, // Replace with your frontend's URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
 }
 
 app.use(cors(corsOptions))
@@ -43,6 +45,8 @@ const limiter = rateLimit({
 })
 
 app.use('/api', limiter)
+
+app.use(cookieParser())
 
 // 4) Transform request ot js and limit size
 

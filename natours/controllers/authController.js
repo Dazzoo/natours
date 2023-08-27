@@ -21,12 +21,14 @@ const createSendToken = (statusCode, user, res) => {
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
+        path: '/',
+    }
+
+    if (process.env.NODE_ENVIROMENT === 'production') {
+        cookieOptions.secure = true
     }
 
     res.cookie('jwt', token, cookieOptions)
-
-    if (process.env.NODE_ENVIROMENT === 'production')
-        cookieOptions.secure = true
 
     res.status(statusCode).json({
         status: 'success',
@@ -50,6 +52,8 @@ module.exports.signup = catchAsync(async (req, res, next) => {
 })
 
 module.exports.login = catchAsync(async (req, res, next) => {
+    console.log('req.cookies', req.cookies)
+
     const { email, password } = req.body
 
     if (!email || !password) {
@@ -67,7 +71,7 @@ module.exports.login = catchAsync(async (req, res, next) => {
 
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
-    const token = req.headers.token
+    const token = req.cookies.jwt || req.headers.token
 
     if (!token) {
         return next(new AppError('Authorisation error'), 401)

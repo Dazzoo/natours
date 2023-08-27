@@ -5,6 +5,7 @@ const { populate } = require('../models/userModel')
 
 module.exports.getAll = (Model) =>
     catchAsync(async (req, res, next) => {
+        console.log('req.cookies', req)
         // FOR REVIES NESTED ROUTE
         let filter = {}
         if (req.params.tourId) filter = { tour: req.params.tourId }
