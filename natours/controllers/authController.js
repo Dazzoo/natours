@@ -1,17 +1,36 @@
 const jwt = require('jsonwebtoken')
 const { promisify } = require('util')
 const crypto = require('crypto')
-const User = require('../models/userModel')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
 const filterObject = require('../utility/filterObject')
 const { sendEmail, emailResetMessageText } = require('../utility/email')
+const User = require('../models/userModel')
+const { createClient } = require('redis')
+
+const redisClient = createClient({
+    socket: {
+        host: 'localhost',
+        port: 6379,
+        tls: process.env.NODE_ENVIROMENT === 'production',
+    },
+})
+
+const bar = async function () {
+    redisClient.on('error', (err) => console.log('Redis Client Error', err))
+
+    await redisClient.connect()
+}
+
+bar()
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES,
     })
 }
+
+const deleteToken = (id) => {}
 
 const createSendToken = (statusCode, user, res) => {
     const token = signToken(user.id)
@@ -48,12 +67,15 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         photo: req.body.photo,
     })
     console.log(process.env.JWT_COOKIE_EXPIRES_IN)
-    createSendToken(201, newUser, res)
+    res.status(201).json({
+        status: 'success',
+        data: {
+            user: newUser,
+        },
+    })
 })
 
 module.exports.login = catchAsync(async (req, res, next) => {
-    console.log('req.cookies', req.cookies)
-
     const { email, password } = req.body
 
     if (!email || !password) {
@@ -69,6 +91,35 @@ module.exports.login = catchAsync(async (req, res, next) => {
     createSendToken(201, user, res)
 })
 
+module.exports.logout = catchAsync(async (req, res, next) => {
+    if (!req.token) {
+        return next(new AppError('You are not logged in'), 400)
+    }
+    const token = req.token
+    const userId = req.user.id
+
+    const blacklist = await redisClient.get(userId)
+
+    if (blacklist !== null) {
+        const parsedData = JSON.parse(blacklist)
+        parsedData[userId].push(token)
+        await redisClient.set(userId, JSON.stringify(parsedData))
+        return res.send({
+            status: 'success',
+            message: 'Logout successful',
+        })
+    }
+
+    const blacklistData = {
+        [userId]: [token],
+    }
+    await redisClient.set(userId, JSON.stringify(blacklistData))
+    return res.send({
+        status: 'success',
+        message: 'Logout successful',
+    })
+})
+
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
     const token = req.cookies.jwt || req.headers.token
@@ -76,6 +127,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
     }
+    req.token = token
 
     // VERIFY TOKEN
 
@@ -88,12 +140,18 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     const currentUser = await User.findById(decode.id).select('+password')
 
     if (!currentUser) {
-        return next(
-            new AppError(
-                'User belonging to this token does not longer exist',
-                401
-            )
-        )
+        return next(new AppError('Authorisation error', 401))
+    }
+    // CHECK IF TOKEN IS NOT BLACKLISTED
+
+    const blacklist = await redisClient.get(currentUser?.id)
+
+    // 3. if so, check if the token provided in the request has been blacklisted. If so, redirect or send a response else move on with the request.
+    if (blacklist !== null) {
+        const parsedData = JSON.parse(blacklist)
+        if (parsedData[currentUser?.id].includes(token)) {
+            return next(new AppError('Authorisation error', 401))
+        }
     }
 
     // CHECK IF USER PASSWORD CHANGED AFTER TOKENN ISSUED
