@@ -7,6 +7,7 @@ const filterObject = require('../utility/filterObject')
 const { sendEmail, emailResetMessageText } = require('../utility/email')
 const User = require('../models/userModel')
 const { createClient } = require('redis')
+const { serialize, parse } = require('cookie')
 
 const redisClient = createClient({
     socket: {
@@ -32,15 +33,15 @@ const signToken = (id) => {
 
 const deleteToken = (id) => {}
 
-const createSendToken = (statusCode, user, res) => {
+const createSendToken = (statusCode, user, res, req) => {
     const token = signToken(user.id)
+    console.log('SIGNED TOKEN', token)
 
     const cookieOptions = {
         expires: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
-        path: '/',
     }
 
     if (process.env.NODE_ENVIROMENT === 'production') {
@@ -66,7 +67,6 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
     })
-    console.log(process.env.JWT_COOKIE_EXPIRES_IN)
     res.status(201).json({
         status: 'success',
         data: {
@@ -88,7 +88,7 @@ module.exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Incorrect email or password'), 401)
     }
 
-    createSendToken(201, user, res)
+    createSendToken(201, user, res, req)
 })
 
 module.exports.logout = catchAsync(async (req, res, next) => {
@@ -122,7 +122,9 @@ module.exports.logout = catchAsync(async (req, res, next) => {
 
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
+
     const token = req.cookies.jwt || req.headers.token
+    console.log(req.headers.token)
 
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
@@ -149,6 +151,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     // 3. if so, check if the token provided in the request has been blacklisted. If so, redirect or send a response else move on with the request.
     if (blacklist !== null) {
         const parsedData = JSON.parse(blacklist)
+
         if (parsedData[currentUser?.id].includes(token)) {
             return next(new AppError('Authorisation error', 401))
         }
@@ -156,7 +159,6 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
     // CHECK IF USER PASSWORD CHANGED AFTER TOKENN ISSUED
     if (currentUser.changedPasswordAfter(decode.iat)) {
-        console.log(currentUser.changedPasswordAfter(decode.iat))
         return next(
             new AppError(
                 'User recently changed password, please log in again',
@@ -172,7 +174,6 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
 module.exports.PermitOnlyTo = (...roles) => {
     return (req, res, next) => {
-        console.log('HERE', !roles.includes(req.user.role))
         if (!roles.includes(req.user.role)) {
             return next(
                 new AppError(
@@ -263,8 +264,6 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
 
     const user = await User.findOne({ _id: decoded.id }).select('+password')
 
-    console.log('123', token)
-
     if (
         !user ||
         !(await user.correctPassword(req.body.password, user.password))
@@ -315,7 +314,6 @@ module.exports.deleteMe = catchAsync(async (req, res, next) => {
     const user = await User.findByIdAndUpdate(req.user.id, {
         active: false,
     })
-    console.log(user)
 
     res.status(200).json({
         message: 'success',

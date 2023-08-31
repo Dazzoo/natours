@@ -16,8 +16,6 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`))
 const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`))
 const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`))
 
-console.log(tours)
-
 mongoose.connect(DB).then((db) => {
     // console.log(db.connections)
     console.log('___________Connected to DB!____________')

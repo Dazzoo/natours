@@ -86,7 +86,6 @@ module.exports.getToursReport = catchAsync(async (req, res, next) => {
 
 module.exports.getMonthlyReport = catchAsync(async (req, res) => {
     const year = req.params.year * 1
-    console.log(new Date(`${year}-01-01`))
     const MonthlyReport = await Tour.aggregate([
         {
             $unwind: '$startDates',

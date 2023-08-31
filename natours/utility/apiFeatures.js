@@ -17,7 +17,6 @@ class APIFeatures {
             /\b(gte|gt|lt|lte)\b/g,
             (match) => `$${match}`
         )
-        console.log('queryString', queryString)
         this.query = this.query.find(JSON.parse(queryString))
         return this
     }
@@ -26,10 +25,8 @@ class APIFeatures {
         if (this.queryString.sort) {
             const sortBy = this.queryString.sort.split(',').join(' ')
             this.query = this.query.sort(sortBy)
-            console.log('1')
         } else {
             this.query = this.query.sort('createdAt')
-            console.log('2')
         }
         return this
     }

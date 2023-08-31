@@ -48,7 +48,6 @@ reviewSchema.index({ tour: 1, user: 1 }, { unique: true })
 // STATIC
 
 reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
-    console.log(tourId)
     const stats = await this.aggregate([
         {
             $match: { tour: tourId },
@@ -91,7 +90,6 @@ reviewSchema.statics.calculateReviewsAverage = async function (tourId) {
 
 reviewSchema.post('save', function () {
     this.constructor.calculateReviewsAverage(this.tour)
-    console.log('save')
 })
 
 reviewSchema.pre('findOneAndUpdate', function (next) {

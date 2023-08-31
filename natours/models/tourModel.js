@@ -142,7 +142,6 @@ tourSchema.virtual('reviews', {
 
 /// SAVE MIDDLEWARE
 tourSchema.pre('save', function (next) {
-    console.log('PRE SAVE HOOK')
     this.slug = slugify(this.name, { lower: true })
     next()
 })

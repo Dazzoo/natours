@@ -6,7 +6,6 @@ const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-
 const tourRouter = require('./routes/toursRoutes')
 const usersRouter = require('./routes/usersRoutes')
 const reviewsRouter = require('./routes/reviewsRoutes')
@@ -16,6 +15,8 @@ const globalErrorHandler = require('./controllers/errorController')
 const app = express()
 
 /// MIDDLEWARES
+
+app.use(cookieParser())
 
 /// 1) Set security HTTP headers
 
@@ -45,8 +46,6 @@ const limiter = rateLimit({
 })
 
 app.use('/api', limiter)
-
-app.use(cookieParser())
 
 // 4) Transform request ot js and limit size
 
