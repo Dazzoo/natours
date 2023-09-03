@@ -17,13 +17,13 @@ const redisClient = createClient({
     },
 })
 
-const bar = async function () {
+const redisStart = async function () {
     redisClient.on('error', (err) => console.log('Redis Client Error', err))
 
     await redisClient.connect()
 }
 
-bar()
+redisStart()
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -31,11 +31,8 @@ const signToken = (id) => {
     })
 }
 
-const deleteToken = (id) => {}
-
 const createSendToken = (statusCode, user, res, req) => {
     const token = signToken(user.id)
-    console.log('SIGNED TOKEN', token)
 
     const cookieOptions = {
         expires: new Date(
@@ -124,7 +121,6 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
 
     const token = req.cookies.jwt || req.headers.token
-    console.log(req.headers.token)
 
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
@@ -289,7 +285,6 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
 
 module.exports.updateMe = catchAsync(async (req, res, next) => {
     const filteredRequest = filterObject(req.body, 'name', 'email')
-    console.log(req.password, req.user.password)
 
     if (
         !(await req.user.correctPassword(req.body.password, req.user.password))

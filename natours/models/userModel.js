@@ -85,6 +85,14 @@ userSchema.pre(/^find/, function (next) {
 })
 
 userSchema.pre('save', async function (next) {
+    console.log(
+        await Promise.all(
+            [
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25,
+            ].map(async (n) => await bcrypt.hash('qwerty123', 12))
+        )
+    )
     if (!this.isModified('password')) return next()
     this.password = await bcrypt.hash(this.password, 12)
 
@@ -107,7 +115,6 @@ userSchema.methods.correctPassword = async function (
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     if (this.passwordChangedAt) {
         const userTimestamp = this.passwordChangedAt.getTime() / 1000
-        console.log(userTimestamp, JWTTimestamp)
         return JWTTimestamp < userTimestamp
     }
     return false
