@@ -18,6 +18,8 @@ tourRouter
 
 tourRouter.route('/params/:slug').get(toursController.getTourBySlug)
 
+tourRouter.use('/:tourId/reviews', reviewsRouter)
+
 tourRouter.use(authController.protect)
 
 tourRouter
@@ -31,8 +33,6 @@ tourRouter
         authController.PermitOnlyTo('admin', 'lead-guide'),
         toursController.deleteTour
     )
-
-tourRouter.use('/:tourId/reviews', reviewsRouter)
 
 tourRouter
     .route('/best-five-tours')

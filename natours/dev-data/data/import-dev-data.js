@@ -29,8 +29,8 @@ app.listen(port, () => {
 
 const importData = async () => {
     try {
-        await Tour.create(tours)
-        await Review.create(reviews)
+        // await Tour.create(tours)
+        // await Review.create(reviews)
         await User.create(users, { validateBeforeSave: false })
     } catch (err) {
         console.log(err)
@@ -40,8 +40,8 @@ const importData = async () => {
 
 const deleteData = async () => {
     try {
-        await Tour.deleteMany()
-        await Review.deleteMany()
+        // await Tour.deleteMany()
+        // await Review.deleteMany()
         await User.deleteMany()
     } catch (err) {
         console.log(err)

@@ -18,7 +18,7 @@ module.exports.getAll = (Model) =>
         // const doc = await features.query.explain()
         const doc = await features.query
 
-        console.log('doc', doc)
+        console.log(doc)
 
         res.status(200).json({
             status: 'success',

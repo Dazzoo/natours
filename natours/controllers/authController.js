@@ -305,6 +305,10 @@ module.exports.updateMe = catchAsync(async (req, res, next) => {
     })
 })
 
+module.exports.updatePhoto = catchAsync(async (req, res, next) => {
+    console.log('req.body', req.body)
+})
+
 module.exports.deleteMe = catchAsync(async (req, res, next) => {
     const user = await User.findByIdAndUpdate(req.user.id, {
         active: false,

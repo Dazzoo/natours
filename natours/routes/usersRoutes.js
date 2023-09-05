@@ -12,29 +12,14 @@ usersRouter.patch('/reset-password/:token', authController.resetPassword)
 
 usersRouter.use(authController.protect)
 
-usersRouter.patch(
-    '/update-password',
-    authController.protect,
-    authController.updatePassword
-)
-usersRouter.patch(
-    '/update-info',
-    authController.protect,
-    authController.updateMe
-)
+usersRouter.patch('/update-photo')
 
-usersRouter.delete(
-    '/delete-me',
-    authController.protect,
-    authController.deleteMe
-)
+usersRouter.patch('/update-password', authController.updatePassword)
+usersRouter.patch('/update-info', authController.updateMe)
 
-usersRouter.get(
-    '/me',
-    authController.protect,
-    usersController.getMe,
-    usersController.getUserById
-)
+usersRouter.delete('/delete-me', authController.deleteMe)
+
+usersRouter.get('/me', usersController.getMe, usersController.getUserById)
 
 usersRouter.use(authController.PermitOnlyTo('admin'))
 
