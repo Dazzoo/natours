@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { promisify } = require('util')
 const crypto = require('crypto')
+const multer = require('multer')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
 const filterObject = require('../utility/filterObject')
@@ -306,7 +307,35 @@ module.exports.updateMe = catchAsync(async (req, res, next) => {
 })
 
 module.exports.updatePhoto = catchAsync(async (req, res, next) => {
-    console.log('req.body', req.body)
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded.' })
+        }
+        const user = await User.findOne({ _id: req.user._id })
+
+        console.log(user)
+        user.photo = {
+            title: req.body.title,
+            description: req.body.description,
+            image: req.file.filename,
+        }
+
+        // Create a new document in your Mongoose model
+        // const photo = new Photo({
+        //     title: req.body.title,
+        //     description: req.body.description,
+        //     image: req.file.filename, // Save the filename in the database
+        // })
+
+        // Save the document to MongoDB
+        console.log(user)
+        await user.save({ validateBeforeSave: false })
+
+        res.status(201).json({ message: 'File uploaded successfully.' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Server error.' })
+    }
 })
 
 module.exports.deleteMe = catchAsync(async (req, res, next) => {

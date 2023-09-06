@@ -1,6 +1,7 @@
 const express = require('express')
 const usersController = require('../controllers/usersController')
 const authController = require('../controllers/authController')
+const upload = require('../utility/multer-config')
 
 const usersRouter = express.Router()
 
@@ -12,7 +13,11 @@ usersRouter.patch('/reset-password/:token', authController.resetPassword)
 
 usersRouter.use(authController.protect)
 
-usersRouter.patch('/update-photo')
+usersRouter.post(
+    '/update-photo',
+    upload.single('photo'),
+    authController.updatePhoto
+)
 
 usersRouter.patch('/update-password', authController.updatePassword)
 usersRouter.patch('/update-info', authController.updateMe)
