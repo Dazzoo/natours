@@ -313,19 +313,11 @@ module.exports.updatePhoto = catchAsync(async (req, res, next) => {
         }
         const user = await User.findOne({ _id: req.user._id })
 
-        console.log(user)
         user.photo = {
-            title: req.body.title,
-            description: req.body.description,
-            image: req.file.filename,
+            data: req.file.buffer,
+            path: req.file.path,
+            contentType: req.file.mimetype,
         }
-
-        // Create a new document in your Mongoose model
-        // const photo = new Photo({
-        //     title: req.body.title,
-        //     description: req.body.description,
-        //     image: req.file.filename, // Save the filename in the database
-        // })
 
         // Save the document to MongoDB
         console.log(user)

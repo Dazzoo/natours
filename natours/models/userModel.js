@@ -59,6 +59,10 @@ const userSchema = new mongoose.Schema({
             type: Buffer,
             required: false,
         },
+        path: {
+            type: String,
+            required: false,
+        },
         contentType: {
             type: String,
             required: false,

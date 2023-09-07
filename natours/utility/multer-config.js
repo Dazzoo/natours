@@ -1,11 +1,23 @@
 const multer = require('multer')
 
+const parseFieleType = (originalname) => {
+    const array = originalname.split('.')
+    const type = '.' + array[array.length - 1]
+    return type
+}
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/') // Specify the directory where uploaded files will be stored
+        cb(null, `public/img/user-photo`) // Specify the directory where uploaded files will be stored
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname) // Generate a unique filename
+        cb(
+            null,
+            `${req.user._id}` +
+                '-' +
+                Date.now() +
+                parseFieleType(file.originalname)
+        ) // Generate a unique filename
     },
 })
 
