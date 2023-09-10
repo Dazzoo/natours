@@ -290,6 +290,7 @@ module.exports.updateMe = catchAsync(async (req, res, next) => {
     if (
         !(await req.user.correctPassword(req.body.password, req.user.password))
     ) {
+        console.log('here')
         return next(new AppError('Not correct password'), 400)
     }
 
