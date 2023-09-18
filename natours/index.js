@@ -23,7 +23,7 @@ app.use(cookieParser())
 app.use(helmet())
 
 const corsOptions = {
-    origin: `${process.env.FRONTEND_URL}`, // Replace with your frontend's URL
+    origin: process.env.FRONTEND_URL, // Replace with your frontend's URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 }
@@ -39,7 +39,7 @@ if (process.env.NODE_ENVIROMENT === 'development') {
 /// 3) Limit api requests
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 5 * 60 * 1000, // 15 minutes
     max: 250, // Limit each IP to [count] requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers

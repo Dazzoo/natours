@@ -46,7 +46,7 @@ const uploadAndResizeImage = (req, res, next) => {
         if (err) {
             return res
                 .status(400)
-                .json({ error: 'File upload failed.', message: err.message })
+                .json({ error: 'File upload failed.', message: err.messageя })
         }
 
         if (!req.file) {
