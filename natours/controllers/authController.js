@@ -255,7 +255,9 @@ module.exports.resetPassword = catchAsync(async (req, res, next) => {
 })
 
 module.exports.updatePassword = catchAsync(async (req, res, next) => {
-    const token = req.headers.token
+    const token = req.token
+
+    console.log('token', token)
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
@@ -272,7 +274,7 @@ module.exports.updatePassword = catchAsync(async (req, res, next) => {
     }
 
     user.password = req.body.passwordNew
-    user.passwordConfirm = req.body.passwordConfirmNe
+    user.passwordConfirm = req.body.passwordConfirmNew
     user.passwordChangedAt = Date.now() - 2000
     await user.save()
 
