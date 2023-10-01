@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { promisify } = require('util')
 const crypto = require('crypto')
-const multer = require('multer')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
 const filterObject = require('../utility/filterObject')
