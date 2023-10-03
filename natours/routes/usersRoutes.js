@@ -1,7 +1,7 @@
 const express = require('express')
 const usersController = require('../controllers/usersController')
 const authController = require('../controllers/authController')
-const { uploadAndResizeImage } = require('../utility/multer-config')
+const { uploadAndResizeUserPhoto } = require('../utility/multer/uploadAndResizeUserPhoto')
 
 const usersRouter = express.Router()
 
@@ -15,7 +15,7 @@ usersRouter.use(authController.protect)
 
 usersRouter.post(
     '/update-photo',
-    uploadAndResizeImage,
+    uploadAndResizeUserPhoto(300, 300),
     authController.updatePhoto
 )
 

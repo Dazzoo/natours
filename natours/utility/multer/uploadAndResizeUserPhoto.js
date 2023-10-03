@@ -41,7 +41,7 @@ const upload = multer({
 }).single('photo') // Assuming you are uploading a single image
 
 // Middleware to handle image upload and resizing
-const uploadAndResizeImage = (req, res, next) => {
+const uploadAndResizeUserPhoto = (height, width) => (req, res, next) => {
     upload(req, res, async (err) => {
         if (err) {
             return res
@@ -57,14 +57,14 @@ const uploadAndResizeImage = (req, res, next) => {
             // Use Sharp to check the image dimensions
             const imageInfo = await sharp(req.file.path).metadata()
 
-            if (imageInfo.width < 300 || imageInfo.height < 300) {
+            if (imageInfo.width < width || imageInfo.height < height) {
                 return res.status(400).json({
-                    error: 'Image dimensions must be at least 300x300 pixels.',
+                    error: `Image dimensions must be at least ${width}x${height} pixels.`,
                 })
             }
 
             const resizedBuffer = await sharp(req.file.path)
-                .resize(300, 300)
+                .resize(width, height)
                 .toBuffer()
 
             // Replace the original file with the resized one
@@ -80,4 +80,4 @@ const uploadAndResizeImage = (req, res, next) => {
     })
 }
 
-module.exports = { upload, uploadAndResizeImage, sharp }
+module.exports = { uploadAndResizeUserPhoto }

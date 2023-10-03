@@ -50,4 +50,11 @@ tourRouter
     .route('/center/:lanlon/units/:units')
     .get(toursController.getToursNearSort)
 
+tourRouter
+    .route('/upload-images/:id')
+    .patch(
+        authController.PermitOnlyTo('admin', 'lead-guide'),
+        toursController.uploadTourImages
+    )
+
 module.exports = tourRouter

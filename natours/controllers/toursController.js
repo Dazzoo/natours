@@ -254,3 +254,41 @@ module.exports.getTourBySlug = catchAsync(async (req, res, next) => {
         },
     })
 })
+
+module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
+    const tourId = req.params.id
+
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded.' })
+        }
+        const tour = await Tour.findOne({ _id: tourId })
+        
+        if (!tour) {
+            return res.status(404).json({ message: 'Tour for this id is not found' })
+        }
+
+        tour.photo = {
+            data: req.file.buffer,
+            path: req.file.path,
+            contentType: req.file.mimetype,
+        }
+
+        // Save the document to MongoDB
+        console.log(user)
+        await user.save({ validateBeforeSave: false })
+
+        res.status(201).json({ message: 'File uploaded successfully.' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: 'Server error.' })
+    }
+
+    res.status(200).json({
+        status: 'success',
+        requestTime: req.requestTime,
+        data: {
+            data: 'This route if not defined yet',
+        },
+    })
+})
