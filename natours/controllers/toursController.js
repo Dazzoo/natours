@@ -263,9 +263,9 @@ module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
     console.log(req.files)
 
     try {
-        if (!req.files) {
-            return res.status(400).json({ message: 'No file uploaded.' })
-        }
+        // if (!req.files) {
+        //     return res.status(400).json({ message: 'No file uploaded.' })
+        // }
         const tour = await Tour.findOne({ _id: tourId })
         if (!tour) {
             return res
@@ -273,15 +273,13 @@ module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
                 .json({ message: 'Tour for this id is not found' })
         }
 
-        // tour.photo = {
-        //     data: req.file.buffer,
-        //     path: req.file.path,
-        //     contentType: req.file.mimetype,
-        // }
+        tour.imageCover = {
+            data: req.files.imageCover[0].buffer,
+        }
+        console.log('tour', tour)
 
         // Save the document to MongoDB
-        console.log(user)
-        await user.save({ validateBeforeSave: false })
+        await tour.save({ validateBeforeSave: false })
 
         res.status(201).json({ message: 'File uploaded successfully.' })
     } catch (error) {

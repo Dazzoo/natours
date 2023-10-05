@@ -77,7 +77,6 @@ const uploadAndResizeTourImages = (width, height) => (req, res, next) => {
                         .resize(width, height)
                         .toBuffer()
                         .then((resizedBuffer) => {
-                            console.log('req.files.images[index]', req.files.images[index])
                             req.files.images[index].buffer = resizedBuffer // Update the buffer with the resized image buffer
                         })
                     //  const resizedBuffer = await sharp(file.buffer)
