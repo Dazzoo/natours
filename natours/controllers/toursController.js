@@ -51,7 +51,9 @@ module.exports.getTourById = factory.getOne(Tour, { path: 'reviews' })
 
 module.exports.createTour = factory.createOne(Tour)
 
-module.exports.editTourParamById = factory.updateOne(Tour)
+module.exports.editTourParamById = factory.updateOne(Tour, {
+    skip_to_next: true,
+})
 
 module.exports.deleteTour = factory.deleteOne(Tour)
 
@@ -257,22 +259,25 @@ module.exports.getTourBySlug = catchAsync(async (req, res, next) => {
 
 module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
     const tourId = req.params.id
+    console.log('uploadTourImages')
+    console.log(req.files)
 
     try {
-        if (!req.file) {
+        if (!req.files) {
             return res.status(400).json({ message: 'No file uploaded.' })
         }
         const tour = await Tour.findOne({ _id: tourId })
-        
         if (!tour) {
-            return res.status(404).json({ message: 'Tour for this id is not found' })
+            return res
+                .status(404)
+                .json({ message: 'Tour for this id is not found' })
         }
 
-        tour.photo = {
-            data: req.file.buffer,
-            path: req.file.path,
-            contentType: req.file.mimetype,
-        }
+        // tour.photo = {
+        //     data: req.file.buffer,
+        //     path: req.file.path,
+        //     contentType: req.file.mimetype,
+        // }
 
         // Save the document to MongoDB
         console.log(user)

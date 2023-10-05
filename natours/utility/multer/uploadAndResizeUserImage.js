@@ -3,7 +3,7 @@ const sharp = require('sharp') // Import sharp library
 
 const parseFieleType = (originalname) => {
     const array = originalname.split('.')
-    const type = '.' + array[array.length - 1]
+    const type = `.${array[array.length - 1]}`
     return type
 }
 
@@ -15,9 +15,7 @@ const storage = multer.diskStorage({
         cb(
             null,
             `${req.user._id}` +
-                '-' +
-                Date.now() +
-                parseFieleType(file.originalname)
+                `-${Date.now()}${parseFieleType(file.originalname)}`
         ) // Generate a unique filename
     },
 })
@@ -41,7 +39,7 @@ const upload = multer({
 }).single('photo') // Assuming you are uploading a single image
 
 // Middleware to handle image upload and resizing
-const uploadAndResizeUserPhoto = (height, width) => (req, res, next) => {
+const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
     upload(req, res, async (err) => {
         if (err) {
             return res
@@ -80,4 +78,4 @@ const uploadAndResizeUserPhoto = (height, width) => (req, res, next) => {
     })
 }
 
-module.exports = { uploadAndResizeUserPhoto }
+module.exports = { uploadAndResizeUserImage }

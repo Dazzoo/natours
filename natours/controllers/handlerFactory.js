@@ -68,7 +68,7 @@ module.exports.createOne = (Model) =>
         })
     })
 
-module.exports.updateOne = (Model) =>
+module.exports.updateOne = (Model, options) =>
     catchAsync(async (req, res, next) => {
         const id = req.params.id
 
@@ -83,14 +83,17 @@ module.exports.updateOne = (Model) =>
                 404
             )
         }
-
-        res.status(200).json({
-            status: 'success',
-            requestTime: req.requestTime,
-            data: {
-                data: doc,
-            },
-        })
+        if (!options?.skip_to_next) {
+            res.status(200).json({
+                status: 'success',
+                requestTime: req.requestTime,
+                data: {
+                    data: doc,
+                },
+            })
+        } else {
+            next()
+        }
     })
 
 module.exports.deleteOne = (Model) =>
