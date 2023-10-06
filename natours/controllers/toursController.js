@@ -51,9 +51,7 @@ module.exports.getTourById = factory.getOne(Tour, { path: 'reviews' })
 
 module.exports.createTour = factory.createOne(Tour)
 
-module.exports.editTourParamById = factory.updateOne(Tour, {
-    skip_to_next: true,
-})
+module.exports.editTourParamById = factory.updateOne(Tour)
 
 module.exports.deleteTour = factory.deleteOne(Tour)
 
@@ -288,7 +286,7 @@ module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
 
         await tour.save()
 
-        res.status(201).json({ message: 'File uploaded successfully.' })
+        next()
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: 'Files uploading error.' })
