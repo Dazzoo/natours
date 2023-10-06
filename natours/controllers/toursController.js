@@ -259,8 +259,6 @@ module.exports.getTourBySlug = catchAsync(async (req, res, next) => {
 
 module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
     const tourId = req.params.id
-    console.log('uploadTourImages')
-    console.log(req.files)
 
     try {
         // if (!req.files) {
@@ -273,25 +271,26 @@ module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
                 .json({ message: 'Tour for this id is not found' })
         }
 
-        tour.imageCover = {
-            data: req.files.imageCover[0].buffer,
-        }
-        console.log('tour', tour)
+        Object.keys(req.files).forEach((key) => {
+            if (key === 'imageCover') {
+                tour.imageCover = {
+                    data: req.files[key][0].buffer,
+                    contentType: req.files[key][0].mimetype,
+                }
+            } else if (key === 'images') {
+                tour.images = req.files[key].map((file) => ({
+                    data: file.buffer,
+                    contentType: file.mimetype,
+                }))
+            }
+        })
+        console.log(tour)
 
-        // Save the document to MongoDB
-        await tour.save({ validateBeforeSave: false })
+        await tour.save()
 
         res.status(201).json({ message: 'File uploaded successfully.' })
     } catch (error) {
         console.error(error)
-        res.status(500).json({ message: 'Server error.' })
+        res.status(500).json({ message: 'Files uploading error.' })
     }
-
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        data: {
-            data: 'This route if not defined yet',
-        },
-    })
 })

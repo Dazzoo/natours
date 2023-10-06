@@ -35,13 +35,15 @@ const tourSchema = new mongoose.Schema(
             required: false,
             default: 0,
         },
-        images: {
-            type: [String],
-            required: false,
-        },
+        images: [
+            {
+                data: { type: Buffer },
+                contentType: { type: String },
+            },
+        ],
         imageCover: {
-            type: 'Buffer',
-            required: [true, 'A tour must have an cover image'],
+            data: { type: Buffer },
+            contentType: { type: String },
         },
         price: {
             type: Number,
