@@ -28,7 +28,7 @@ tourRouter
     .get(toursController.getTourById)
     .patch(
         authController.PermitOnlyTo('admin', 'lead-guide'),
-        uploadAndResizeTourImages(1920, 1080),
+        uploadAndResizeTourImages(1999, 1332),
         toursController.uploadTourImages,
         toursController.editTourParamById
     )
