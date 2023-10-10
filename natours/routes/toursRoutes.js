@@ -2,7 +2,7 @@ const express = require('express')
 const toursController = require('../controllers/toursController')
 const authController = require('../controllers/authController')
 const reviewsRouter = require('./reviewsRoutes')
-const { uploadAndResizeTourImages } = require('../utility/multer/uploadAndResizeTourImages')
+const { uploadToFileAndResizeTourImages } = require('../utility/multer/uploadToFileAndResizeTourImages')
 
 const tourRouter = express.Router()
 
@@ -28,7 +28,7 @@ tourRouter
     .get(toursController.getTourById)
     .patch(
         authController.PermitOnlyTo('admin', 'lead-guide'),
-        uploadAndResizeTourImages(1999, 1332),
+        uploadToFileAndResizeTourImages(1999, 1332),
         toursController.uploadTourImages,
         toursController.editTourParamById
     )

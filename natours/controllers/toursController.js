@@ -257,7 +257,6 @@ module.exports.getTourBySlug = catchAsync(async (req, res, next) => {
 
 module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
     const tourId = req.params.id
-
     try {
         // if (!req.files) {
         //     return res.status(400).json({ message: 'No file uploaded.' })
@@ -269,20 +268,20 @@ module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
                 .json({ message: 'Tour for this id is not found' })
         }
 
-        Object.keys(req.files).forEach((key) => {
-            if (key === 'imageCover') {
-                tour.imageCover = {
-                    data: req.files[key][0].buffer,
-                    contentType: req.files[key][0].mimetype,
-                }
-            } else if (key === 'images') {
-                tour.images = req.files[key].map((file) => ({
-                    data: file.buffer,
-                    contentType: file.mimetype,
-                }))
+        if (req.imageCover) {
+            tour.imageCover = {
+                path: req.imageCover,
+                contentType: 'image/jpeg',
             }
-        })
-        console.log(tour)
+        }
+        if (req.images) {
+            const data = req.images.map((path) => ({
+                path: path,
+                contentType: 'image/jpeg',
+            }))
+            tour.images = data
+        }
+        console.log(req.images)
 
         await tour.save()
 

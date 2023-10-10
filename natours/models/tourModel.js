@@ -37,12 +37,12 @@ const tourSchema = new mongoose.Schema(
         },
         images: [
             {
-                data: { type: Buffer },
+                path: { type: String },
                 contentType: { type: String },
             },
         ],
         imageCover: {
-            data: { type: Buffer },
+            path: { type: String },
             contentType: { type: String },
         },
         price: {

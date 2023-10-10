@@ -1,13 +1,13 @@
 const catchAsync = require('../utility/catchAsync')
 const AppError = require('../utility/appError')
 const APIFeatures = require('../utility/apiFeatures')
-const { populate } = require('../models/userModel')
 
 module.exports.getAll = (Model) =>
     catchAsync(async (req, res, next) => {
         // FOR REVIES NESTED ROUTE
         let filter = {}
         if (req.params.tourId) filter = { tour: req.params.tourId }
+        console.log('here')
 
         const features = new APIFeatures(Model.find(filter), req.query)
             .filter()
