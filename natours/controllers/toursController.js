@@ -281,7 +281,6 @@ module.exports.uploadTourImages = catchAsync(async (req, res, next) => {
             }))
             tour.images = data
         }
-        console.log(req.images)
 
         await tour.save()
 

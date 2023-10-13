@@ -1,6 +1,51 @@
 const formData = require('form-data')
 const Mailgun = require('mailgun.js')
+const WelcomeHtml = require('./emailTemplates/Welcome.js')
+
 const mailgun = new Mailgun(formData)
+
+const Email = class Email {
+    constructor(user, url) {
+        this.to = user.email
+        this.firstName = user.name.split(' ')[0]
+        this.url = url
+        this.from = process.env.EMAIL_FROM
+    }
+
+    createTransporter() {
+        if (process.env.NODE_ENVIROMENT === 'production') {
+            return 1
+        }
+
+        return mailgun.client({
+            username: 'api',
+            key: process.env.MAILGUN_API_KEY,
+        })
+    }
+
+    send(subject, text, html) {
+        const transporter = this.createTransporter()
+        console.log('transporter', transporter)
+        return transporter.messages.create(
+            'sandbox7404f1c745ad493cbe1b9ea7c1e6db7a.mailgun.org',
+            {
+                from: this.from,
+                to: [this.to],
+                subject,
+                text,
+                html,
+            }
+        )
+    }
+
+    async sendWelcome() {
+        return await this.send(
+            `Hello ${this.firstName}`,
+            'Greetings from Natours!',
+            WelcomeHtml(this.firstName, this.url)
+        )
+    }
+}
 
 const sendEmail = function (props) {
     const mg = mailgun.client({
@@ -53,4 +98,5 @@ const emailResetMessageText = function (props) {
 module.exports = {
     sendEmail,
     emailResetMessageText,
+    Email,
 }

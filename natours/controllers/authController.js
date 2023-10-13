@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchAsync')
 const filterObject = require('../utility/filterObject')
-const { sendEmail, emailResetMessageText } = require('../utility/email')
+const { sendEmail, emailResetMessageText, Email } = require('../utility/email')
 const User = require('../models/userModel')
 const { createClient } = require('redis')
 const { serialize, parse } = require('cookie')
@@ -28,6 +28,12 @@ redisStart()
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES,
+    })
+}
+
+const signEmailToken = (email) => {
+    return jwt.sign({ email }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EMAIL_EXPIRES,
     })
 }
 
@@ -64,6 +70,9 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         passwordConfirm: req.body.passwordConfirm,
         photo: req.body.photo,
     })
+    const token = signEmailToken(newUser.email)
+
+    await new Email(newUser, `${process.env.FRONTEND_URL}/confirmEmail/${token}`).sendWelcome()
     res.status(201).json({
         status: 'success',
         data: {
@@ -256,7 +265,6 @@ module.exports.resetPassword = catchAsync(async (req, res, next) => {
 module.exports.updatePassword = catchAsync(async (req, res, next) => {
     const token = req.token
 
-    console.log('token', token)
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
@@ -291,7 +299,6 @@ module.exports.updateMe = catchAsync(async (req, res, next) => {
     if (
         !(await req.user.correctPassword(req.body.password, req.user.password))
     ) {
-        console.log('here')
         return next(new AppError('Not correct password'), 400)
     }
 
@@ -322,7 +329,6 @@ module.exports.updatePhoto = catchAsync(async (req, res, next) => {
         }
 
         // Save the document to MongoDB
-        console.log(user)
         await user.save({ validateBeforeSave: false })
 
         res.status(201).json({ message: 'File uploaded successfully.' })

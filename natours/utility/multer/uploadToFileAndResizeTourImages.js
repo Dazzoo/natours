@@ -52,14 +52,14 @@ const uploadToFileAndResizeTourImages = (width, height) => (req, res, next) => {
                 req.images = []
                 await req.files.images.forEach(async (file, index) => {
                     const imageInfo = await sharp(file.buffer).metadata()
-                    // if (imageInfo.width < width || imageInfo.height < height) {
-                    //     return next(
-                    //         new AppError(
-                    //             `Image dimensions must be at least ${width}x${height} pixels.`
-                    //         ),
-                    //         400
-                    //     )
-                    // }
+                    if (imageInfo.width < width || imageInfo.height < height) {
+                        return next(
+                            new AppError(
+                                `Image dimensions must be at least ${width}x${height} pixels.`
+                            ),
+                            400
+                        )
+                    }
 
                     const fileName = `tour-${req.params.id}-${Date.now()}-${
                         index + 1
@@ -80,14 +80,14 @@ const uploadToFileAndResizeTourImages = (width, height) => (req, res, next) => {
                 const imageInfo = await sharp(
                     req.files.imageCover[0].buffer
                 ).metadata()
-                // if (imageInfo.width < width || imageInfo.height < height) {
-                //     return next(
-                //         new AppError(
-                //             `Image dimensions must be at least ${width}x${height} pixels.`
-                //         ),
-                //         400
-                //     )
-                // }
+                if (imageInfo.width < width || imageInfo.height < height) {
+                    return next(
+                        new AppError(
+                            `Image dimensions must be at least ${width}x${height} pixels.`
+                        ),
+                        400
+                    )
+                }
                 req.imageCover = `tour-${
                     req.params.id
                 }-${Date.now()}-cover.jpeg`

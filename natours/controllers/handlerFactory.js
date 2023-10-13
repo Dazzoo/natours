@@ -7,7 +7,6 @@ module.exports.getAll = (Model) =>
         // FOR REVIES NESTED ROUTE
         let filter = {}
         if (req.params.tourId) filter = { tour: req.params.tourId }
-        console.log('here')
 
         const features = new APIFeatures(Model.find(filter), req.query)
             .filter()
@@ -18,7 +17,6 @@ module.exports.getAll = (Model) =>
         // const doc = await features.query.explain()
         const doc = await features.query
 
-        console.log(doc)
 
         res.status(200).json({
             status: 'success',
