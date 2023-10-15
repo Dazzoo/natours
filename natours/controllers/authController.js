@@ -39,7 +39,6 @@ const signEmailToken = (email) => {
 
 const createSendToken = (statusCode, user, res, req) => {
     const token = signToken(user.id)
-
     const cookieOptions = {
         expires: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -68,7 +67,7 @@ module.exports.signup = catchAsync(async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
-        photo: req.body.photo,
+        photo: req.body.photo
     })
     const token = signEmailToken(newUser.email)
 
@@ -88,7 +87,13 @@ module.exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Please provide email and passsword'), 400)
     }
 
-    const user = await User.findOne({ email }).select('+password')
+    const user = await User.findOne({ email }).select('+password +activatedEmail')
+
+    console.log('user', user)
+
+    if (!user.activatedEmail) {
+        next(new AppError('Please, verify you email address'), 401)
+    }
 
     if (!user || !(await user.correctPassword(password, user.password))) {
         return next(new AppError('Incorrect email or password'), 401)
@@ -142,7 +147,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
     const decode = await decodeAsync(token, process.env.JWT_SECRET)
 
-    // CHECK IF USER IS STILL EXISTS
+    // CHECK IF USER IS STILL EXISTS 1
 
     const currentUser = await User.findById(decode.id).select('+password')
 
@@ -349,4 +354,41 @@ module.exports.deleteMe = catchAsync(async (req, res, next) => {
             user: user,
         },
     })
+})
+
+module.exports.verifyEmail = catchAsync(async (req, res, next) => {
+    const emailToken = req.params.emailToken
+
+    if (!emailToken) {
+        return next(new AppError('Not email token provided'), 400)
+    }
+
+     const decodeAsync = promisify(jwt.verify)
+
+    const decode = await decodeAsync(emailToken, process.env.JWT_SECRET)
+    console.log(decode)
+
+
+
+    const currentUser = await User.findOneAndUpdate(
+        { email: decode?.email },
+        { $set: { activatedEmail: true } },
+        { new: true }
+      )
+
+
+    res.status(200).json({
+        message: 'success',
+        data: {
+            message: 'Account has been activated. Now you can login.',
+        },
+    })
+
+    // const currentUser = await User.findById(decode.id).select('+password')
+
+    // if (!currentUser) {
+    //     return next(new AppError('Authorisation error', 401))
+    // }
+
+
 })

@@ -25,7 +25,6 @@ const Email = class Email {
 
     send(subject, text, html) {
         const transporter = this.createTransporter()
-        console.log('transporter', transporter)
         return transporter.messages.create(
             'sandbox7404f1c745ad493cbe1b9ea7c1e6db7a.mailgun.org',
             {

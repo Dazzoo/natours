@@ -72,6 +72,11 @@ const userSchema = new mongoose.Schema({
         default: true,
         select: false,
     },
+    activatedEmail: {
+        type: Boolean,
+        default: false,
+        select: false,
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpiresAt: Date,
