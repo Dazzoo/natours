@@ -62,6 +62,7 @@ const createSendToken = (statusCode, user, res, req) => {
 }
 
 module.exports.signup = catchAsync(async (req, res, next) => {
+
     const newUser = await User.create({
         name: req.body.name,
         email: req.body.email,
@@ -91,12 +92,12 @@ module.exports.login = catchAsync(async (req, res, next) => {
 
     console.log('user', user)
 
-    if (!user.activatedEmail) {
-        next(new AppError('Please, verify you email address'), 401)
-    }
-
     if (!user || !(await user.correctPassword(password, user.password))) {
         return next(new AppError('Incorrect email or password'), 401)
+    }
+
+    if (!user?.activatedEmail) {
+        next(new AppError('Please, verify you email address'), 401)
     }
 
     createSendToken(201, user, res, req)
