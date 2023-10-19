@@ -1,5 +1,6 @@
 const multer = require('multer')
 const sharp = require('sharp') // Import sharp library
+const AppError = require('../appError')
 
 const parseFieleType = (originalname) => {
     const array = originalname.split('.')
@@ -42,13 +43,11 @@ const upload = multer({
 const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
     upload(req, res, async (err) => {
         if (err) {
-            return res
-                .status(400)
-                .json({ error: 'File upload failed.', message: err.messageя })
+            return next(new AppError('File upload failed.'), 400)
         }
 
         if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded.' })
+            return next(new AppError('No file uploaded.'), 400)
         }
 
         try {
@@ -56,9 +55,12 @@ const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
             const imageInfo = await sharp(req.file.path).metadata()
 
             if (imageInfo.width < width || imageInfo.height < height) {
-                return res.status(400).json({
-                    error: `Image dimensions must be at least ${width}x${height} pixels.`,
-                })
+                return next(
+                    new AppError(
+                        `Image dimensions must be at least ${width}x${height} pixels.`
+                    ),
+                    400
+                )
             }
 
             const resizedBuffer = await sharp(req.file.path)
@@ -70,10 +72,10 @@ const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
 
             next() // Continue with the next middleware or route handler
         } catch (error) {
-            console.error('Error:', error.message) // Log the error message
-            return res.status(500).json({
-                error: 'An error occurred while processing the image.',
-            })
+            return next(
+                new AppError('An error occurred while processing the image.'),
+                500
+            )
         }
     })
 }
