@@ -37,7 +37,7 @@ const signEmailToken = (email) => {
     })
 }
 
-const createSendToken = (statusCode, user, res, req) => {
+const createSendToken = (statusCode, user, res, message) => {
     const token = signToken(user.id)
     const cookieOptions = {
         expires: new Date(
@@ -54,6 +54,7 @@ const createSendToken = (statusCode, user, res, req) => {
 
     res.status(statusCode).json({
         status: 'success',
+        message: message || null,
         token,
         data: {
             user: user,
@@ -199,6 +200,7 @@ module.exports.PermitOnlyTo = (...roles) => {
 
 module.exports.forgotPassword = catchAsync(async (req, res, next) => {
     const email = req.body.email
+    console.log(email)
     const user = await User.findOne({ email })
 
     if (!user) {
@@ -213,14 +215,7 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false })
 
     try {
-        const emailResult = await sendEmail({
-            email: email,
-            subject: 'Password Reset Instructions',
-            message: emailResetMessageText({
-                name: user.name,
-                link: `${process.env.BASE_URL}/api/v1/users/reset-password/${resetToken}`,
-            }),
-        })
+        await new Email(user, `${process.env.FRONTEND_URL}/reset-password/${resetToken}`).sendResetPassword()
 
         res.status(200).json({
             status: 'success',
@@ -245,6 +240,7 @@ module.exports.forgotPassword = catchAsync(async (req, res, next) => {
 
 module.exports.resetPassword = catchAsync(async (req, res, next) => {
     const resetToken = req.params.token
+    
     const resetTokenEncrypted = crypto
         .createHash('sha256')
         .update(resetToken)
@@ -254,7 +250,6 @@ module.exports.resetPassword = catchAsync(async (req, res, next) => {
         passwordResetToken: resetTokenEncrypted,
         passwordResetExpiresAt: { $gt: Date.now() },
     })
-
     if (!user) {
         return next(new AppError('Token is invalid or has expired', 400))
     }
@@ -265,7 +260,7 @@ module.exports.resetPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpiresAt = undefined
     await user.save()
 
-    createSendToken(201, user, res)
+    createSendToken(201, user, res, 'Password has been updated successfully.')
 })
 
 module.exports.updatePassword = catchAsync(async (req, res, next) => {

@@ -1,6 +1,7 @@
 const formData = require('form-data')
 const Mailgun = require('mailgun.js')
 const WelcomeHtml = require('./emailTemplates/Welcome.js')
+const ResetPassword = require('./emailTemplates/ResetPassword.js')
 
 const mailgun = new Mailgun(formData)
 
@@ -42,6 +43,14 @@ const Email = class Email {
             `Hello ${this.firstName}`,
             'Greetings from Natours!',
             WelcomeHtml(this.firstName, this.url)
+        )
+    }
+
+    async sendResetPassword() {
+        return await this.send(
+            `Password Reset`,
+            `Hello ${this.firstName}`,
+            ResetPassword(this.firstName, this.url)
         )
     }
 }
