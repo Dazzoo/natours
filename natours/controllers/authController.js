@@ -54,7 +54,7 @@ const createSendToken = (statusCode, user, res, message) => {
 
     res.status(statusCode).json({
         status: 'success',
-        message: message || null,
+        message: `${message || 'success'}`,
         token,
         data: {
             user: user,
@@ -99,7 +99,7 @@ module.exports.login = catchAsync(async (req, res, next) => {
         next(new AppError('Please, verify you email address'), 401)
     }
 
-    createSendToken(201, user, res, req)
+    createSendToken(201, user, res)
 })
 
 module.exports.logout = catchAsync(async (req, res, next) => {
