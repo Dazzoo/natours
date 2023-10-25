@@ -13,7 +13,7 @@ bookingRouter
     .post(authController.protect, bookingsController.createBooking)
 
 bookingRouter
-    .route('/:id')
+    .route('/my')
     .get(authController.protect, bookingsController.getBookingsByUserId)
 
 module.exports = bookingRouter

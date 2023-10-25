@@ -139,6 +139,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
     }
+
     req.token = token
 
     // VERIFY TOKEN

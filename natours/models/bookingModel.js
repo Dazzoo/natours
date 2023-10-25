@@ -35,7 +35,6 @@ bookingSchema.pre(/^find/, function (next) {
     this.populate([
         {
             path: 'tour',
-            select: 'name',
         },
     ]).populate('user')
     next()
