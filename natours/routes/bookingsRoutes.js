@@ -12,4 +12,8 @@ bookingRouter
     .route('/')
     .post(authController.protect, bookingsController.createBooking)
 
+bookingRouter
+    .route('/:id')
+    .get(authController.protect, bookingsController.getBookingsByUserId)
+
 module.exports = bookingRouter

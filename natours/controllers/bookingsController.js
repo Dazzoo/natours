@@ -47,4 +47,16 @@ module.exports.createCheckoutSession = catchAsync(async (req, res, next) => {
     })
 })
 
+module.exports.getBookingsByUserId = catchAsync(async (req, res, next) => {
+    const id = req.user.id
+
+    const doc = await Booking.find({
+        user: id,
+    })
+    res.status(200).json({
+        message: 'success',
+        data: doc,
+    })
+})
+
 module.exports.createBooking = factory.createOne(Booking)
