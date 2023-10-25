@@ -1,7 +1,9 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const Tour = require('../models/tourModel')
+const Booking = require('../models/bookingModel')
 const catchAsync = require('../utility/catchAsync')
 const AppError = require('../utility/appError')
+const factory = require('./handlerFactory')
 
 module.exports.createCheckoutSession = catchAsync(async (req, res, next) => {
     const tourId = req.params.tourId
@@ -44,3 +46,5 @@ module.exports.createCheckoutSession = catchAsync(async (req, res, next) => {
         data: session,
     })
 })
+
+module.exports.createBooking = factory.createOne(Booking)

@@ -8,4 +8,8 @@ bookingRouter
     .route('/checkout-session/:tourId')
     .get(authController.protect, bookingsController.createCheckoutSession)
 
+bookingRouter
+    .route('/')
+    .post(authController.protect, bookingsController.createBooking)
+
 module.exports = bookingRouter
