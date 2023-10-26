@@ -18,7 +18,7 @@ const redisClient = createClient({
 })
 
 const redisStart = async function () {
-    redisClient.on('error', (err) => console.log('Redis Client Error', err))
+    redisClient.on('error', (err) => console.log('💥 Redis Client Error 💥', err))
 
     await redisClient.connect()
 }
@@ -199,7 +199,6 @@ module.exports.PermitOnlyTo = (...roles) => {
 
 module.exports.forgotPassword = catchAsync(async (req, res, next) => {
     const email = req.body.email
-    console.log(email)
     const user = await User.findOne({ email })
 
     if (!user) {
@@ -361,9 +360,6 @@ module.exports.verifyEmail = catchAsync(async (req, res, next) => {
      const decodeAsync = promisify(jwt.verify)
 
     const decode = await decodeAsync(emailToken, process.env.JWT_SECRET)
-    console.log(decode)
-
-
 
     const currentUser = await User.findOneAndUpdate(
         { email: decode?.email },

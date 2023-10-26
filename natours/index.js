@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
+const compression = require('compression')
 const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
 const cors = require('cors')
@@ -61,6 +62,8 @@ app.use(mongoSanitize())
 app.use(xss())
 
 app.use(express.static(`${__dirname}/public`))
+
+app.use(compression())
 
 // 6) Testing middleware
 

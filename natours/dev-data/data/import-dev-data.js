@@ -17,7 +17,6 @@ const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`))
 const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`))
 
 mongoose.connect(DB).then((db) => {
-    // console.log(db.connections)
     console.log('___________Connected to DB!____________')
 })
 
@@ -33,6 +32,7 @@ const importData = async () => {
         // await Review.create(reviews)
         await User.create(users, { validateBeforeSave: false })
     } catch (err) {
+        console.log('💥 error 💥')
         console.log(err)
     }
     process.exit()
@@ -44,6 +44,7 @@ const deleteData = async () => {
         // await Review.deleteMany()
         await User.deleteMany()
     } catch (err) {
+        console.log('💥 error 💥')
         console.log(err)
     }
     process.exit()

@@ -181,7 +181,6 @@ tourSchema.pre(/^find/, function (next) {
 })
 
 tourSchema.post(/^find/, function (doc, next) {
-    console.log(`Query took ${Date.now() - this.start} ms`)
     next()
 })
 
