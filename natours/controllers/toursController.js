@@ -39,7 +39,6 @@ const factory = require('./handlerFactory')
 //             status: 'Required params: name, price',
 //         })
 //     }
-//     console.log(!req.body.price)
 //     next()
 // }
 
