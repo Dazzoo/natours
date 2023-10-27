@@ -10,6 +10,7 @@ const { createClient } = require('redis')
 const { serialize, parse } = require('cookie')
 
 const redisClient = createClient({
+    password: process.env.NODE_ENVIROMENT === 'production' ? process.env.REDIS_PASSWORD : undefined,
     socket: {
         host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
