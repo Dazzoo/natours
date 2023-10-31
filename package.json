@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node server.js",
         "start:dev": "nodemon server.js",
-        "start:prod": "SET NODE_ENVIROMENT=production & nodemon server.js",
+        "start:prod": "SET NODE_ENVIRONMENT=production & nodemon server.js",
         "debugger": "ndb server.js"
     },
     "repository": {

@@ -14,7 +14,7 @@ const Email = class Email {
     }
 
     createTransporter() {
-        if (process.env.NODE_ENVIROMENT === 'production') {
+        if (process.env.NODE_ENVIRONMENT === 'production') {
             return 1
         }
 

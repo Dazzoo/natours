@@ -34,7 +34,7 @@ app.use(cors(corsOptions))
 
 /// 2) DEV middlewares
 
-if (process.env.NODE_ENVIROMENT === 'development') {
+if (process.env.NODE_ENVIRONMENT === 'development') {
     app.use(morgan('dev'))
 }
 
