@@ -25,7 +25,7 @@ app.use(cookieParser())
 app.use(helmet())
 
 const corsOptions = {
-    origin: process.env.FRONTEND_URL, // Replace with your frontend's URL
+    origin: '*', // Replace with your frontend's URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 }
