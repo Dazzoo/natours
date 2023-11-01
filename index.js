@@ -20,7 +20,7 @@ const app = express()
 
 app.use(cookieParser())
 
-/// 1) Set security HTTP headers
+/// 1) Set security HTTP headers -
 
 app.use(helmet())
 
