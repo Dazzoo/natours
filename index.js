@@ -22,14 +22,12 @@ app.use(cookieParser())
 
 /// 1) Set security HTTP headers
 
-app.use(helmet())
+// app.use(helmet())
 
 const corsOptions = {
     origin: process.env.FRONTEND_URL, // Replace with your frontend's URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 200,
 }
 
 app.use(cors(corsOptions))
