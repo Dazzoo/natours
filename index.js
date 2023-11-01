@@ -28,7 +28,8 @@ const corsOptions = {
     origin: process.env.FRONTEND_URL, // Replace with your frontend's URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    preflightContinue: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
 }
 
 app.use(cors(corsOptions))
