@@ -15,5 +15,12 @@ module.exports.deleteUser = factory.deleteOne(User)
 
 module.exports.getMe = catchAsync(async (req, res, next) => {
     req.params.id = req.user._id
+
+    if (!req.params.id) {
+        return next(
+            new AppError(`User is not logged in`),
+            404
+        )
+    }
     next()
 })
