@@ -30,16 +30,13 @@ module.exports.getAll = (Model) =>
 module.exports.getOne = (Model, populateOptions) =>
     catchAsync(async (req, res, next) => {
         const id = req.params.id
-        console.log('1')
 
         let doc = await Model.findById(id)
-        console.log('2')
 
         if (populateOptions && doc) {
             doc = await doc.populate(populateOptions)
         }
         // .populate({ path: 'reviews' })
-        console.log('3')
 
         if (!doc) {
             return next(
