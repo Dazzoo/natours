@@ -54,9 +54,9 @@ module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500
     err.status = err.status || 'error'
 
-    if (process.env.NODE_ENVIROMENT === 'development') {
+    if (process.env.NODE_ENVIRONMENT === 'development') {
         sendErrorDev(err, res)
-    } else if (process.env.NODE_ENVIROMENT === 'production') {
+    } else if (process.env.NODE_ENVIRONMENT === 'production') {
         let error = { ...err }
         if (err.name === 'CastError') error = handleCastErrorDB(error)
         if (err.code === 11000) error = handleDuplicateErrorDB(error)

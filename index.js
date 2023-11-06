@@ -20,7 +20,7 @@ const app = express()
 
 app.use(cookieParser())
 
-/// 1) Set security HTTP headers
+/// 1) Set security HTTP headers -
 
 app.use(helmet())
 
@@ -34,7 +34,7 @@ app.use(cors(corsOptions))
 
 /// 2) DEV middlewares
 
-if (process.env.NODE_ENVIROMENT === 'development') {
+if (process.env.NODE_ENVIRONMENT === 'development') {
     app.use(morgan('dev'))
 }
 

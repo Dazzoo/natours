@@ -10,10 +10,11 @@ const { createClient } = require('redis')
 const { serialize, parse } = require('cookie')
 
 const redisClient = createClient({
+    password: process.env.NODE_ENVIRONMENT === 'production' ? process.env.REDIS_PASSWORD : undefined,
     socket: {
         host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
-        tls: process.env.NODE_ENVIROMENT === 'production',
+        // tls: process.env.NODE_ENVIRONMENT === 'production',
     },
 })
 
@@ -46,7 +47,7 @@ const createSendToken = (statusCode, user, res, message) => {
         httpOnly: true,
     }
 
-    if (process.env.NODE_ENVIROMENT === 'production') {
+    if (process.env.NODE_ENVIRONMENT === 'production') {
         cookieOptions.secure = true
     }
 
