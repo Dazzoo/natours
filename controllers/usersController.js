@@ -14,13 +14,6 @@ module.exports.editUserParamById = factory.updateOne(User)
 module.exports.deleteUser = factory.deleteOne(User)
 
 module.exports.getMe = catchAsync(async (req, res, next) => {
-    res.status(200).json({
-        status: 'success',
-        requestTime: req.requestTime,
-        data: {
-            data: 'test response',
-        },
-    })
     req.params.id = req.user._id
     if (!req.params.id) {
         return next(
