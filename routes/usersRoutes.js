@@ -12,7 +12,6 @@ usersRouter.post('/forgot-password', authController.forgotPassword)
 usersRouter.patch('/reset-password/:token', authController.resetPassword)
 usersRouter.get('/verifyEmail/:emailToken', authController.verifyEmail)
 
-usersRouter.use(authController.protect)
 
 usersRouter.post(
     '/update-photo',

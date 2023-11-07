@@ -146,6 +146,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
     // VERIFY TOKEN
 
     const decodeAsync = promisify(jwt.verify)
+    
 
     const decode = await decodeAsync(token, process.env.JWT_SECRET)
 
