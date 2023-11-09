@@ -139,6 +139,8 @@ module.exports.logout = catchAsync(async (req, res, next) => {
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
 
+    console.log('PROTECT', req)
+
     const token = req.cookies.jwt || req.headers.token
 
 
