@@ -141,7 +141,6 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
     const token = req.cookies.jwt || req.headers.token
 
-    console.log('here', token)
 
     if (!token) {
         return next(new AppError('Authorisation error'), 401)
