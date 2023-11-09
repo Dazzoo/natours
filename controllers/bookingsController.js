@@ -48,6 +48,7 @@ module.exports.createCheckoutSession = catchAsync(async (req, res, next) => {
 })
 
 module.exports.getBookingsByUserId = catchAsync(async (req, res, next) => {
+    console.log('here')
     const id = req.user.id
 
     const doc = await Booking.find({
