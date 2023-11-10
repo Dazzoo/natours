@@ -48,8 +48,9 @@ const createSendToken = (statusCode, user, res, message) => {
     }
 
     if (process.env.NODE_ENVIRONMENT === 'production') {
-        cookieOptions.sameSite = 'none'
         cookieOptions.secure = true
+        cookieOptions.sameSite = 'none'
+
     } else {
         cookieOptions.secure = false;
         cookieOptions.sameSite = 'lax'
@@ -139,9 +140,12 @@ module.exports.logout = catchAsync(async (req, res, next) => {
 module.exports.protect = catchAsync(async (req, res, next) => {
     // CHECK IF TOKEN I THERE
 
-    console.log('PROTECT', req)
+    if (req.originalUrl === '/api/v1/bookings/my') {
+        console.log('req', req)
+    }
 
-    const token = req.cookies.jwt || req.headers.token
+    const token = req.cookies.jwt 
+    // || req.headers.token
 
 
     if (!token) {
