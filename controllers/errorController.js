@@ -53,7 +53,9 @@ const sendErrorDev = (err, res) => {
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500
     err.status = err.status || 'error'
-
+    console.log('API ERROR 💥')
+    console.log(err)
+    console.log('API ERROR 💥')
     if (process.env.NODE_ENVIRONMENT === 'development') {
         sendErrorDev(err, res)
     } else if (process.env.NODE_ENVIRONMENT === 'production') {
@@ -64,6 +66,7 @@ module.exports = (err, req, res, next) => {
             error = handleValidationErrorDB(error)
         if (err.name === 'JsonWebTokenError') error = handleJWTTokenError()
         if (err.name === 'TokenExpiredError') error = handleJWTExpiredError()
+        if (req.path === '/api/v1/users/login') return sendErrorDev(err, res)
         sendErrorProd(error, res)
     }
 }
