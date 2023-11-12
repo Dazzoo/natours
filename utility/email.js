@@ -15,7 +15,10 @@ const Email = class Email {
 
     createTransporter() {
         if (process.env.NODE_ENVIRONMENT === 'production') {
-            return 1
+            return mailgun.client({
+                username: 'api',
+                key: process.env.MAILGUN_API_KEY,
+            })
         }
 
         return mailgun.client({
