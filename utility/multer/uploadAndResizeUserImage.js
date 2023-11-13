@@ -41,7 +41,7 @@ const upload = multer({
 
 // Middleware to handle image upload and resizing
 const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
-    console.log('UPLOAD-IMAGE')
+    console.log('UPLOAD-IMAGE', req.file)
     upload(req, res, async (err) => {
         if (err) {
             return next(new AppError('File upload failed.'), 400)
