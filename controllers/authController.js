@@ -332,14 +332,21 @@ module.exports.updatePhoto = catchAsync(async (req, res, next) => {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded.' })
         }
-        const user = await User.findOne({ _id: req.user._id })
+        const user = await User.findOne({ _id: req.user._id }) 
 
-        user.photo = {
-            data: req.file.buffer,
-            path: req.file.path,
-            contentType: req.file.mimetype,
+        if (process.env.NODE_ENVIRONMENT === 'production') {
+            user.photo = {
+                data: req.file.buffer,
+                path: req.file.aws_location,
+                contentType: req.file.mimetype,
+            }
+        } else {
+            user.photo = {
+                data: req.file.buffer,
+                path: req.file.path,
+                contentType: req.file.mimetype,
+            }
         }
-
         // Save the document to MongoDB
         await user.save({ validateBeforeSave: false })
 

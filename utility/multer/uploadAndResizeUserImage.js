@@ -1,6 +1,9 @@
 const multer = require('multer')
 const sharp = require('sharp') // Import sharp library
 const AppError = require('../appError')
+const { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsCommand } = require("@aws-sdk/client-s3")
+const { Upload } = require("@aws-sdk/lib-storage");
+const { createReadStream } = require('fs');
 
 const parseFieleType = (originalname) => {
     const array = originalname.split('.')
@@ -41,8 +44,8 @@ const upload = multer({
 
 // Middleware to handle image upload and resizing
 const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
+    console.log('UPLOAD-IMAGE', req)
     upload(req, res, async (err) => {
-        console.log('UPLOAD-IMAGE', req.file)
         if (err) {
             return next(new AppError('File upload failed.'), 400)
         }
@@ -68,8 +71,35 @@ const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
                 .resize(width, height)
                 .toBuffer()
 
-            // Replace the original file with the resized one
-            await sharp(resizedBuffer).toFile(req.file.path)
+            if (process.env.NODE_ENVIRONMENT === 'production') {
+                let s3Client = new S3Client({
+                    region: process.env.AWS_REGION, 
+                    maxRetries: 15,
+                    credentials: {
+                        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                        secretAccessKey: process.env.AWS_ACCESS_KEY
+                    }
+                })
+                const uploadParams = {
+                    Bucket: 'natours-bucket-1',
+                    Key: req.file.path,  // File name you want to save as in S3
+                    Body: resizedBuffer,
+                };
+                try {
+                    const parallelUploads3 = new Upload({
+                        client: s3Client,
+                        params: uploadParams
+                    });
+            
+                    const result = await parallelUploads3.done();
+                    req.file.aws_location = result.Location
+                    return result;
+                } catch (err) {
+                    console.log("Error", err);
+                }
+            } else {
+                await sharp(resizedBuffer).toFile(req.file.path)
+            }
 
             next() // Continue with the next middleware or route handler
         } catch (error) {
