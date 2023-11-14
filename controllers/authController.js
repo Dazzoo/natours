@@ -334,7 +334,7 @@ module.exports.updatePhoto = catchAsync(async (req, res, next) => {
         }
         const user = await User.findOne({ _id: req.user._id }) 
 
-        if (process.env.NODE_ENVIRONMENT === 'production') {
+        if (process.env.NODE_ENVIRONMENT) {
             user.photo = {
                 data: req.file.buffer,
                 path: req.file.aws_location,

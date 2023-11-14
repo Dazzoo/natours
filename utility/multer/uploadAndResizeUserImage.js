@@ -44,7 +44,7 @@ const upload = multer({
 
 // Middleware to handle image upload and resizing
 const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
-    console.log('UPLOAD-IMAGE', req)
+    console.log('UPLOAD-IMAGE')
     upload(req, res, async (err) => {
         if (err) {
             return next(new AppError('File upload failed.'), 400)
@@ -71,7 +71,7 @@ const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
                 .resize(width, height)
                 .toBuffer()
 
-            if (process.env.NODE_ENVIRONMENT === 'production') {
+            if (process.env.NODE_ENVIRONMENT) {
                 let s3Client = new S3Client({
                     region: process.env.AWS_REGION, 
                     maxRetries: 15,
@@ -93,14 +93,13 @@ const uploadAndResizeUserImage = (height, width) => (req, res, next) => {
             
                     const result = await parallelUploads3.done();
                     req.file.aws_location = result.Location
-                    return result;
                 } catch (err) {
                     console.log("Error", err);
                 }
             } else {
                 await sharp(resizedBuffer).toFile(req.file.path)
             }
-
+            console.log('here-1')
             next() // Continue with the next middleware or route handler
         } catch (error) {
             return next(
