@@ -49,7 +49,7 @@ const createSendToken = (statusCode, user, res, message) => {
 
     if (process.env.NODE_ENVIRONMENT === 'production') {
         cookieOptions.secure = true
-        cookieOptions.sameSite = 'none'
+        cookieOptions.sameSite = 'lax'
 
     } else {
         cookieOptions.secure = false;
