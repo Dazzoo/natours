@@ -144,7 +144,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
         console.log('req', req)
     }
 
-    const token = req.cookies.jwt 
+    const token = req.cookies.jwt || req.headers.jwt 
     // || req.headers.token
     console.log('---TOKEN---', token)
 
