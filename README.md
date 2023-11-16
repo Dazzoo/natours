@@ -1,12 +1,12 @@
 # Natours API
 
-This is the back-end app for the Natours project, which is a fictional nature tours booking website. This project is developed using Node.js, MongoDb, Express, Mongoose and JavaScript.
+This is the API for the Natours project, a fictional nature tours booking website. Developed using Node.js, MongoDB, Express, Mongoose, and JavaScript, it provides a robust backend for the booking system.
 
-You can read DOCUMENTATION here: https://documenter.getpostman.com/view/26563015/2s9YXpTxky
+The documentation for the API is accessible here: https://documenter.getpostman.com/view/26563015/2s9YXpTxky
 
-FRONTEND production DEMO: https://natours-frontend-c8da54608917.herokuapp.com
+See the production demo for the frontend here: https://natours-frontend-c8da54608917.herokuapp.com
 
-BACK-END API: https://natours-back-end-f19a9ffbcdd5.herokuapp.com/
+The backend API is live at: https://natours-back-end-f19a9ffbcdd5.herokuapp.com/
 
 ## Getting Started
 
