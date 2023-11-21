@@ -8,6 +8,15 @@ See the production demo for the frontend here: https://natours-frontend-c8da5460
 
 The backend API is live at: https://natours-back-end-f19a9ffbcdd5.herokuapp.com/
 
+This project is an interactive, dynamic, and robust platform.
+Utilizing a modern tech stack including Node.js for back-end, MongoDB as our database, and Express.js for creating a powerful server environment.
+Data flow is managed via Mongoose for seamless interaction with MongoDB.
+Stripe provides a secure transaction platform.
+I have integrated Mailgun for reliable email delivery.
+Amazon S3 ensures secure and efficient file storage.
+This project uses Redis as a storage for authentication tokens from logged out sessions, all running in a Docker container.
+The application is delivered through a high-performance JavaScript API.
+
 ## Getting Started
 
 To get started with the project locally, you can follow these steps:
