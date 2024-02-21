@@ -2,6 +2,8 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const https = require('https');
 const fs = require('fs');
+const express = require('express');
+const path = require('path');
 
 dotenv.config({ path: '.env' });
 const app = require('./index');
@@ -21,7 +23,18 @@ mongoose.connect(DB).then((db) => {
 const port = process.env.PORT;
 const isProduction = process.env.NODE_ENV === 'production';
 
+
 if (isProduction) {
+
+    // Serve static files from the Next.js app
+    app.use(express.static(path.join(__dirname, '../natours-frontend')));
+
+    // The "catchall" handler: for any request that doesn't
+    // match one above, send back Next.js's index.html file.
+    app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../natours-frontend', 'index.html'));
+    });
+
     const options = {
         key: fs.readFileSync('./privkey.pem'),
         cert: fs.readFileSync('./cert.pem'),
