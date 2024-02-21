@@ -21,6 +21,7 @@
     "homepage": "https://github.com/Dazzoo/natours#readme",
     "dependencies": {
         "@aws-sdk/client-s3": "^3.449.0",
+        "@aws-sdk/client-translate": "^3.462.0",
         "@aws-sdk/lib-storage": "^3.450.0",
         "@stripe/stripe-js": "^2.1.9",
         "bcryptjs": "^2.4.3",

@@ -10,9 +10,10 @@ const Email = class Email {
         this.to = user.email
         this.firstName = user.name.split(' ')[0]
         this.url = url
-        this.from = process.env.EMAIL_FROM
-    }
+        this.from = `Yurii Shushanskyi from Natours <natours@${process.env.MAILGUN_DOMAIN}>` 
+    } 
 
+    // `'"${process.env.EMAIL_FROM_NAME}"  <${process.env.MAILGUN_DOMAIN}>'`
     createTransporter() {
         if (process.env.NODE_ENVIRONMENT === 'production') {
             return mailgun.client({
@@ -30,7 +31,7 @@ const Email = class Email {
     send(subject, text, html) {
         const transporter = this.createTransporter()
         return transporter.messages.create(
-            'sandbox7404f1c745ad493cbe1b9ea7c1e6db7a.mailgun.org',
+            process.env.MAILGUN_DOMAIN,
             {
                 from: this.from,
                 to: [this.to],
