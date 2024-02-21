@@ -19,7 +19,7 @@ mongoose.connect(DB).then((db) => {
 });
 
 const port = process.env.PORT;
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENVIRONMENT === 'production';
 
 if (isProduction) {
     const options = {
