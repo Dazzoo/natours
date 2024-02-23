@@ -51,13 +51,6 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-frontend.prepare().then(() => {
-    app.get('*', (req, res) => {   
-         return handle(req, res);
-    });
-
-})
-
 app.use('/api', limiter)
 
 // 4) Transform request ot js and limit size
@@ -93,9 +86,18 @@ app.use('/api/v1/reviews', reviewsRouter)
 
 app.use('/api/v1/bookings', bookingsRouter)
 
-app.all('*', (req, res, next) => {
-    next(new AppError(`Can't find ${req.originalUrl} on the server`, 404))
+
+frontend.prepare().then(() => {
+    app.all('*', (req, res, next) => {
+        return handle(req, res);
+    })
+
 })
+
+
+// app.all('*', (req, res, next) => {
+//     next(new AppError(`Can't find ${req.originalUrl} on the server`, 404))
+// })
 
 app.use(globalErrorHandler)
 
