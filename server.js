@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const next = require('next');
+const api = require('./index');
 
 dotenv.config({ path: '.env' });
 
@@ -30,9 +31,10 @@ app.prepare().then(() => {
   const server = express();
 
   // Your existing Express routes go here
+  server.use('/api', api);
 
   // Add a custom route for Next.js rendering
-  server.get('*', (req, res) => {
+  server.get('*', (req, res) => {   
     return handle(req, res);
   });
 
