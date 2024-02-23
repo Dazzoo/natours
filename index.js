@@ -13,8 +13,19 @@ const reviewsRouter = require('./routes/reviewsRoutes')
 const bookingsRouter = require('./routes/bookingsRoutes')
 const AppError = require('./utility/appError')
 const globalErrorHandler = require('./controllers/errorController')
+const next = require('next');
 
 const app = express()
+
+const frontend = next({ dev: !(process.env.NODE_ENVIRONMENT === 'production'), dir: '../natours-frontend' });
+const handle = frontend.getRequestHandler();
+
+frontend.prepare().then(() => {
+    app.get('*', (req, res) => {   
+         return handle(req, res);
+    });
+
+})
 
 /// MIDDLEWARES
 
@@ -47,7 +58,7 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-app.use('/', limiter)
+app.use('/api', limiter)
 
 // 4) Transform request ot js and limit size
 
@@ -74,13 +85,13 @@ app.use((req, res, next) => {
 
 /// ROUTES
 
-app.use('/v1/tours', tourRouter)
+app.use('/api/v1/tours', tourRouter)
 
-app.use('/v1/users', usersRouter)
+app.use('/api/v1/users', usersRouter)
 
-app.use('/v1/reviews', reviewsRouter)
+app.use('/api/v1/reviews', reviewsRouter)
 
-app.use('/v1/bookings', bookingsRouter)
+app.use('/api/v1/bookings', bookingsRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on the server`, 404))
