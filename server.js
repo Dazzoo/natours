@@ -31,7 +31,7 @@ app.prepare().then(() => {
   const server = express();
 
   // Your existing Express routes go here
-  server.use('/', api);
+  server.use('/api', api);
 
   // Add a custom route for Next.js rendering
   server.get('*', (req, res) => {   
