@@ -2,57 +2,58 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const https = require('https');
 const fs = require('fs');
-const express = require('express');
 const path = require('path');
+const express = require('express');
+const next = require('next');
 
 dotenv.config({ path: '.env' });
-const app = require('./index');
 
 process.on('uncaughtException', (err) => {
-    console.log('💥 ERROR: uncaughtException 💥');
-    console.log(err);
-    process.exit(1);
+  console.log('💥 ERROR: uncaughtException 💥');
+  console.log(err);
+  process.exit(1);
 });
 
 const DB = process.env.DB_URL.replace('<PASSWORD>', process.env.DB_PASSWORD);
 
 mongoose.connect(DB).then((db) => {
-    console.log('___________Connected to DB!____________');
+  console.log('Connected to DB!');
 });
 
 const port = process.env.PORT;
 const isProduction = process.env.NODE_ENVIRONMENT === 'production';
 
+const app = next({ dev: !isProduction });
+const handle = app.getRequestHandler();
 
-if (isProduction) {
+app.prepare().then(() => {
+  const server = express();
 
-    // Serve static files from the Next.js app
-    app.use(express.static(path.join(__dirname, '../natours-frontend')));
+  // Your existing Express routes go here
 
-    // The "catchall" handler: for any request that doesn't
-    // match one above, send back Next.js's index.html file.
-    app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../natours-frontend', 'index.html'));
-    });
+  // Add a custom route for Next.js rendering
+  server.get('*', (req, res) => {
+    return handle(req, res);
+  });
 
+  if (isProduction) {
     const options = {
-        key: fs.readFileSync('./privkey.pem'),
-        cert: fs.readFileSync('./cert.pem'),
+      key: fs.readFileSync('./privkey.pem'),
+      cert: fs.readFileSync('./cert.pem'),
     };
-
-    const server = https.createServer(options, app).listen(port, () => {
-        console.log('App is running with HTTPS...');
+  
+    https.createServer(options, server).listen(port, () => {
+      console.log('App is running with HTTPS...');
     });
-} else {
-    const server = app.listen(port, () => {
-        console.log('App is running...');
+  } else {
+    server.listen(port, () => {
+      console.log('App is running...');
     });
-}
+  }
+});
 
 process.on('unhandledRejection', (err) => {
-    console.log('💥 ERROR: unhandledRejection 💥');
-    console.log(err.name, err.message);
-    server.close(() => {
-        process.exit(1);
-    });
+  console.log('💥 ERROR: unhandledRejection 💥');
+  console.log(err.name, err.message);
+  process.exit(1);
 });
