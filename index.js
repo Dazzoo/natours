@@ -20,13 +20,6 @@ const app = express()
 const frontend = next({ dev: !(process.env.NODE_ENVIRONMENT === 'production'), dir: '../natours-frontend' });
 const handle = frontend.getRequestHandler();
 
-frontend.prepare().then(() => {
-    app.get('*', (req, res) => {   
-         return handle(req, res);
-    });
-
-})
-
 /// MIDDLEWARES
 
 app.use(cookieParser())
@@ -56,6 +49,13 @@ const limiter = rateLimit({
     max: 250, // Limit each IP to [count] requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+
+frontend.prepare().then(() => {
+    app.get('*', (req, res) => {   
+         return handle(req, res);
+    });
+
 })
 
 app.use('/api', limiter)
