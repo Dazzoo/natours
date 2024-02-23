@@ -47,7 +47,7 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-app.use('/api', limiter)
+app.use('/', limiter)
 
 // 4) Transform request ot js and limit size
 
@@ -74,13 +74,13 @@ app.use((req, res, next) => {
 
 /// ROUTES
 
-app.use('/api/v1/tours', tourRouter)
+app.use('v1/tours', tourRouter)
 
-app.use('/api/v1/users', usersRouter)
+app.use('v1/users', usersRouter)
 
-app.use('/api/v1/reviews', reviewsRouter)
+app.use('v1/reviews', reviewsRouter)
 
-app.use('/api/v1/bookings', bookingsRouter)
+app.use('v1/bookings', bookingsRouter)
 
 app.all('*', (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on the server`, 404))
