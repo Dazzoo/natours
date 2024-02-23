@@ -23,7 +23,7 @@ mongoose.connect(DB).then((db) => {
 const port = process.env.PORT;
 const isProduction = process.env.NODE_ENVIRONMENT === 'production';
 
-const app = next({ dev: !isProduction });
+const app = next({ dev: !isProduction, dir: '../natours-frontend' });
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
